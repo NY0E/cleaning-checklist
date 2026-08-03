@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1c1b19">
+<title>BaseKC Housekeeping</title>
+</head>
+<body style="margin:0; background:#1c1b19;">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#1c1b19;
+    --paper:#f6f1e7;
+    --paper-dim:#ece4d4;
+    --rust:#a8462b;
+    --rust-dark:#7e331f;
+    --pine:#3c5b45;
+    --pine-dark:#2b4232;
+    --gold:#c69a3f;
+    --line: rgba(28,27,25,0.14);
+    --shadow: 0 2px 10px rgba(28,27,25,0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  .bkc-root{
+    font-family: 'Inter', sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100%;
+    padding: 0 0 40px 0;
+  }
+
+  .bkc-header{
+    padding: 22px 18px 16px;
+    border-bottom: 1px solid rgba(246,241,231,0.12);
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    z-index: 20;
+  }
+
+  .bkc-brand{
+    display:flex;
+    align-items:baseline;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .bkc-brand .mark{
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+  }
+  .bkc-brand .sub{
+    font-size: 12px;
+    color: rgba(246,241,231,0.55);
+    font-weight: 500;
+  }
+
+  .bkc-title{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.01em;
+    margin: 0 0 14px 0;
+  }
+
+  .bkc-selectors{
+    display:flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .bkc-home-btn{
+    width: 34px; height: 34px;
+    border-radius: 100px;
+    border: 1px solid rgba(246,241,231,0.25);
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .bkc-home-panel{
+    display:none;
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: rgba(246,241,231,0.08);
+    border: 1px solid rgba(246,241,231,0.18);
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .bkc-home-panel.show{ display:block; }
+  .bkc-home-panel b{ color: var(--gold); }
+  .bkc-home-panel p{ margin: 6px 0; }
+  .bkc-panel-close-row{
+    display:flex;
+    justify-content: flex-end;
+  }
+  .bkc-panel-close{
+    background: transparent;
+    border: none;
+    color: rgba(246,241,231,0.6);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+  .bkc-panel-close:hover{ background: rgba(246,241,231,0.12); }
+  .bkc-pill{
+    font-family:'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 100px;
+    border: 1px solid rgba(246,241,231,0.25);
+    background: transparent;
+    color: var(--paper);
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .bkc-pill.active{
+    background: var(--rust);
+    border-color: var(--rust);
+    color: #fff;
+  }
+  .bkc-pill:active{ transform: scale(0.96); }
+
+  .bkc-progress-wrap{
+    padding: 16px 18px 4px;
+    display:flex;
+    align-items:center;
+    gap: 14px;
+  }
+  .bkc-stamp{
+    flex-shrink:0;
+    width: 56px; height:56px;
+    border-radius:50%;
+    border: 3px solid var(--pine);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Oswald', sans-serif;
+    font-weight:700;
+    font-size: 15px;
+    color: var(--pine);
+    background: rgba(60,91,69,0.12);
+    position:relative;
+    transition: all .2s ease;
+  }
+  .bkc-stamp.done{
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(198,154,63,0.15);
+    transform: rotate(-6deg) scale(1.05);
+  }
+  .bkc-progress-track{
+    flex:1;
+    height: 8px;
+    background: rgba(246,241,231,0.12);
+    border-radius: 100px;
+    overflow:hidden;
+  }
+  .bkc-progress-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--rust), var(--gold));
+    border-radius:100px;
+    transition: width .3s ease;
+  }
+  .bkc-progress-label{
+    font-size: 12px;
+    color: rgba(246,241,231,0.6);
+    margin-top: 6px;
+  }
+
+  .bkc-flags{
+    margin: 10px 18px 0;
+    padding: 10px 14px;
+    background: rgba(168,70,43,0.18);
+    border: 1px solid rgba(168,70,43,0.4);
+    border-radius: 10px;
+    font-size: 13px;
+    display:none;
+  }
+  .bkc-flags.show{ display:block; }
+  .bkc-flags b{ color: var(--gold); }
+
+  .bkc-pest-banner{
+    display:none;
+    margin: 10px 18px 0;
+    padding: 10px 14px;
+    background: rgba(184,134,11,0.18);
+    border: 1px solid rgba(184,134,11,0.45);
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .bkc-pest-banner.show{ display:block; }
+  .bkc-pest-banner b{ color: #b8860b; }
+
+  .bkc-notes-wrap{
+    margin: 14px 18px 0;
+  }
+  .bkc-notes-label{
+    display:block;
+    font-size: 12px;
+    font-weight:600;
+    color: rgba(246,241,231,0.55);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .bkc-notes-input{
+    width: 100%;
+    font-family:'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(246,241,231,0.2);
+    background: rgba(246,241,231,0.06);
+    color: var(--paper);
+    resize: vertical;
+  }
+  .bkc-notes-input::placeholder{
+    color: rgba(246,241,231,0.35);
+  }
+
+  .bkc-identity-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: rgba(246,241,231,0.7);
+  }
+  .bkc-logout-link{
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .bkc-login-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .bkc-login-overlay.show{ display: flex; }
+  .bkc-login-box{
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 24px 20px;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .bkc-login-brand{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    color: var(--rust);
+    margin-bottom: 6px;
+  }
+  .bkc-login-title{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+  .bkc-login-input{
+    width: 100%;
+    font-family:'Inter', sans-serif;
+    font-size: 15px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--ink);
+  }
+
+  .bkc-body{
+    padding: 18px 14px 0;
+  }
+
+  .bkc-section{
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .bkc-section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 16px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .bkc-section-title{
+    font-family:'Oswald', sans-serif;
+    font-weight:600;
+    font-size: 15px;
+    letter-spacing:0.01em;
+  }
+  .bkc-section-count{
+    font-size: 12px;
+    color: rgba(28,27,25,0.5);
+    font-weight:600;
+  }
+  .bkc-section-subtitle{
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rust);
+    margin-top: 2px;
+  }
+  .bkc-chevron{
+    width: 18px; height:18px;
+    transition: transform .2s ease;
+    opacity:0.5;
+  }
+  .bkc-section.collapsed .bkc-chevron{ transform: rotate(-90deg); }
+  .bkc-section.collapsed .bkc-items{ display:none; }
+
+  .bkc-items{
+    border-top: 1px solid var(--line);
+  }
+
+  .bkc-item.critical{
+    background: rgba(168,70,43,0.06);
+    border-left: 3px solid var(--rust);
+    padding-left: 13px;
+  }
+  .bkc-critical-tag{
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: var(--rust);
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 2px;
+  }
+
+  .bkc-item{
+    display:flex;
+    align-items:flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .bkc-item:last-child{ border-bottom:none; }
+
+  .bkc-check{
+    width: 24px; height: 24px;
+    border-radius: 7px;
+    border: 2px solid rgba(28,27,25,0.3);
+    flex-shrink:0;
+    margin-top: 1px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #fff;
+    transition: all .15s ease;
+  }
+  .bkc-check.checked{
+    background: var(--pine);
+    border-color: var(--pine);
+  }
+  .bkc-check svg{ width:14px; height:14px; opacity:0; transition: opacity .1s ease; }
+  .bkc-check.checked svg{ opacity:1; }
+
+  .bkc-item-text{
+    flex:1;
+    font-size: 14.5px;
+    line-height:1.4;
+    padding-top: 2px;
+    transition: all .15s ease;
+  }
+  .bkc-item.done .bkc-item-text{
+    text-decoration: line-through;
+    color: rgba(28,27,25,0.4);
+  }
+  .bkc-item-note{
+    font-size: 12px;
+    color: var(--rust-dark);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .bkc-flag-btn{
+    flex-shrink:0;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: rgba(28,27,25,0.35);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .bkc-flag-btn.flagged{ color: var(--rust); }
+  .bkc-flag-btn svg{ width:17px; height:17px; }
+
+  .bkc-note-input{
+    display:none;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 10px;
+    font-family:'Inter', sans-serif;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fffdf9;
+    color: var(--ink);
+    resize:vertical;
+  }
+  .bkc-note-input.show{ display:block; }
+
+  .bkc-camera-btn{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    font-family:'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 11px;
+    border-radius: 8px;
+    border: 1px solid var(--pine);
+    background: rgba(60,91,69,0.08);
+    color: var(--pine-dark);
+    cursor:pointer;
+  }
+  .bkc-camera-btn svg{ width:15px; height:15px; }
+  .bkc-camera-btn:active{ transform: scale(0.97); }
+
+  .bkc-owner-note{
+    font-size: 12.5px;
+    color: var(--rust-dark);
+    background: rgba(198,154,63,0.16);
+    border-left: 3px solid var(--gold);
+    padding: 6px 9px;
+    border-radius: 6px;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .bkc-owner-note b{ color: var(--rust-dark); }
+
+  .bkc-owner-note-input{
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px 10px;
+    font-family:'Inter', sans-serif;
+    font-size: 13px;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: #fffdf6;
+    color: var(--ink);
+    resize: vertical;
+  }
+
+  .bkc-ref-btn{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    font-family:'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(28,27,25,0.2);
+    background: transparent;
+    color: rgba(28,27,25,0.55);
+    cursor:pointer;
+  }
+  .bkc-ref-btn svg{ width:14px; height:14px; }
+  .bkc-ref-placeholder{
+    margin-top: 6px;
+    padding: 14px 10px;
+    border: 1px dashed rgba(28,27,25,0.3);
+    border-radius: 8px;
+    font-size: 12px;
+    color: rgba(28,27,25,0.45);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .bkc-pest-btn.pest-active{
+    color: #b8860b;
+    background: rgba(184,134,11,0.14);
+  }
+  .bkc-pest-wrap{
+    margin: 0 16px 12px;
+    padding: 10px;
+    background: rgba(184,134,11,0.08);
+    border: 1px solid rgba(184,134,11,0.35);
+    border-radius: 8px;
+  }
+  .bkc-pest-label{
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #8a6508;
+    margin-bottom: 6px;
+  }
+  .bkc-pest-note-input{
+    width: 100%;
+    font-family:'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border: 1px solid rgba(184,134,11,0.4);
+    border-radius: 8px;
+    background: #fffdf6;
+    color: var(--ink);
+    resize: vertical;
+  }
+
+  .bkc-comment-btn.comment-active{
+    color: var(--rust);
+    background: rgba(168,70,43,0.14);
+  }
+  .bkc-comment-btn.note-pending{
+    color: var(--gold);
+    background: rgba(198,154,63,0.16);
+  }
+  .bkc-thread{
+    margin-top: 8px;
+    padding: 10px;
+    background: rgba(198,154,63,0.08);
+    border: 1px solid rgba(198,154,63,0.35);
+    border-radius: 8px;
+  }
+  .bkc-thread-msg{
+    font-size: 12.5px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .bkc-thread-msg-steve{
+    background: rgba(198,154,63,0.18);
+    border-left: 3px solid var(--gold);
+    color: var(--rust-dark);
+  }
+  .bkc-thread-msg-steve b{ color: var(--rust-dark); }
+  .bkc-thread-edit-link{
+    display: block;
+    background: none;
+    border: none;
+    color: var(--pine);
+    font-size: 11.5px;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0 0 8px;
+  }
+  .bkc-thread-reply-label{
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(28,27,25,0.55);
+    margin-bottom: 4px;
+  }
+  .bkc-thread-close{
+    margin-top: 8px;
+    font-family:'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--pine);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .bkc-floor-divider{
+    font-family:'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 16px 4px 8px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .bkc-floor-divider::after{
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(246,241,231,0.15);
+  }
+
+  .bkc-footer{
+    padding: 20px 18px 4px;
+    display:flex;
+    gap: 10px;
+  }
+  .bkc-btn{
+    flex:1;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size: 14px;
+    padding: 13px;
+    border-radius: 10px;
+    border: none;
+    cursor:pointer;
+  }
+  .bkc-btn.primary{
+    background: var(--pine);
+    color: #fff;
+  }
+  .bkc-btn.ghost{
+    background: transparent;
+    border: 1px solid rgba(246,241,231,0.3);
+    color: var(--paper);
+  }
+
+  .bkc-meta{
+    text-align:center;
+    font-size: 11px;
+    color: rgba(246,241,231,0.35);
+    padding: 14px 18px 0;
+  }
+
+  .bkc-btn.submit{
+    background: var(--rust);
+    color: #fff;
+    position: relative;
+  }
+  .bkc-submit-row{
+    padding: 0 18px;
+    margin-top: 10px;
+  }
+  .bkc-demo-tag{
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.25);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+  .bkc-toast{
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--pine-dark);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: all .25s ease;
+    z-index: 100;
+    max-width: 85%;
+    text-align: center;
+  }
+  .bkc-toast.show{
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .bkc-loading{
+    padding: 40px 18px;
+    text-align:center;
+    color: rgba(246,241,231,0.5);
+    font-size: 14px;
+  }
+
+  .bkc-modal-overlay{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .bkc-modal-overlay.show{
+    display: flex;
+  }
+  .bkc-modal{
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  .bkc-modal-title{
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .bkc-modal-input{
+    width: 100%;
+    font-family:'Inter', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.2em;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fffdf9;
+    color: var(--ink);
+  }
+  .bkc-modal-error{
+    color: var(--rust);
+    font-size: 12.5px;
+    font-weight: 600;
+    min-height: 18px;
+    margin-top: 6px;
+  }
+  .bkc-modal-btn-row{
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .bkc-modal-btn-row .bkc-btn.ghost{
+    border: 1px solid rgba(28,27,25,0.25);
+    color: var(--ink);
+  }
+
+  .bkc-archive-entry{
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(246,241,231,0.06);
+    border: 1px solid rgba(246,241,231,0.15);
+    border-radius: 8px;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .bkc-archive-entry b{ color: var(--gold); }
+  .bkc-archive-detail{
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(246,241,231,0.15);
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .bkc-archive-photo-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .bkc-archive-photo-thumb{
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid rgba(246,241,231,0.2);
+  }
+</style>
+
+<div class="bkc-root" id="bkcRoot">
+  <div class="bkc-login-overlay" id="bkcLoginOverlay">
+    <div class="bkc-login-box">
+      <div class="bkc-login-brand">BASEKC</div>
+      <div class="bkc-login-title" id="bkcLoginTitle">Sign in to continue</div>
+      <input class="bkc-login-input" id="bkcLoginName" type="text" placeholder="Your name" autocomplete="off" />
+      <input class="bkc-login-input" id="bkcLoginPin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN" style="margin-top:8px;" />
+      <div class="bkc-modal-error" id="bkcLoginErrorMsg"></div>
+      <button class="bkc-btn primary" id="bkcLoginSubmit" style="width:100%; margin-top:10px;">Sign In</button>
+    </div>
+  </div>
+
+  <div class="bkc-header">
+    <div class="bkc-brand">
+      <span class="mark">BASEKC</span>
+      <span class="sub">Housekeeping Turnover</span>
+    </div>
+    <div class="bkc-title" id="bkcTitle">Turnover Checklist</div>
+    <div class="bkc-selectors" id="bkcUnitSelect"></div>
+    <div class="bkc-selectors" id="bkcTypeSelect" style="margin-top:8px;"></div>
+    <div class="bkc-identity-row">
+      <span id="bkcIdentityLabel">Signed in as —</span>
+      <button class="bkc-logout-link" id="bkcLogoutBtn">Sign out</button>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+      <div class="bkc-selectors" id="bkcLangSelect"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="bkc-home-btn" id="bkcArchiveBtn">📁</button>
+        <button class="bkc-home-btn" id="bkcHelpBtn">❓</button>
+        <button class="bkc-home-btn" id="bkcHomeBtn">📱</button>
+      </div>
+    </div>
+    <div class="bkc-home-panel" id="bkcHelpPanel"></div>
+    <div class="bkc-home-panel" id="bkcHomePanel"></div>
+    <div class="bkc-home-panel" id="bkcArchivePanel"></div>
+  </div>
+
+  <div class="bkc-progress-wrap">
+    <div class="bkc-stamp" id="bkcStamp">0%</div>
+    <div style="flex:1;">
+      <div class="bkc-progress-track"><div class="bkc-progress-fill" id="bkcFill" style="width:0%;"></div></div>
+      <div class="bkc-progress-label" id="bkcProgLabel">0 of 0 done</div>
+    </div>
+  </div>
+
+  <div class="bkc-flags" id="bkcFlagBanner"></div>
+  <div class="bkc-pest-banner" id="bkcPestBanner"></div>
+
+  <div class="bkc-notes-wrap">
+    <label class="bkc-notes-label" for="bkcNotesInput" id="bkcNotesLabel">Notes for Steve</label>
+    <textarea class="bkc-notes-input" id="bkcNotesInput" rows="2" placeholder="Anything else worth mentioning — leave it here."></textarea>
+  </div>
+
+  <div class="bkc-body" id="bkcBody">
+    <div class="bkc-loading">Loading checklist…</div>
+  </div>
+
+  <div class="bkc-submit-row">
+    <button class="bkc-btn submit" id="bkcSubmitBtn" style="width:100%;">
+      Complete &amp; Archive Turnover
+    </button>
+  </div>
+
+  <div class="bkc-meta" id="bkcMeta"></div>
+
+  <div class="bkc-toast" id="bkcToast"></div>
+
+  <div class="bkc-modal-overlay" id="bkcPasscodeOverlay">
+    <div class="bkc-modal">
+      <div class="bkc-modal-title" id="bkcPasscodeTitle">Enter passcode to complete this turnover</div>
+      <input class="bkc-modal-input" id="bkcPasscodeInput" type="password" inputmode="numeric" autocomplete="off" />
+      <div class="bkc-modal-error" id="bkcPasscodeErrorMsg"></div>
+      <div class="bkc-modal-btn-row">
+        <button class="bkc-btn ghost" id="bkcPasscodeCancel" style="flex:1;">Cancel</button>
+        <button class="bkc-btn primary" id="bkcPasscodeConfirm" style="flex:1;">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+
+  const SUPABASE_URL = 'https://qpbiejkshgobfxxrvryf.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_YrnhAmEDKuRU-Y2c5EY6uw_BlRq9qVy';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  const UNITS = [
+    { id: 'A', label: 'Unit A (14104)' },
+    { id: 'B', label: 'Unit B (14106)' },
+    { id: 'DUPLEX', label: 'Whole Duplex' },
+  ];
+  const TYPES = [
+    { id: 'turnover', label: 'Turnover' },
+    { id: 'deep-clean', label: 'Quarterly Deep Clean' },
+  ];
+
+  function checkIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5L9.5 17L19 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function chevronIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="#1c1b19" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function flagIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M6 3V21M6 3H17L14 7L17 11H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function cameraIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M4 8H7L9 5H15L17 8H20V19H4V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.2" stroke="currentColor" stroke-width="2"/></svg>';
+  }
+  function pencilIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M4 20L4.9 16.5L15 6.4L17.6 9L7.5 19.1L4 20Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13.5 7.9L16.1 10.5" stroke="currentColor" stroke-width="2"/></svg>';
+  }
+  function refPhotoIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M4 5H8L9.5 3H14.5L16 5H20V17H4V5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.6" stroke="currentColor" stroke-width="1.8"/></svg>';
+  }
+  function bugIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="13" rx="5" ry="6.5" stroke="currentColor" stroke-width="2"/><path d="M12 6.5V4M9 6L7.5 4M15 6L16.5 4M4 11L7 12M20 11L17 12M4 16L7 14.5M20 16L17 14.5M9.5 20L9 22M14.5 20L15 22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  }
+  function commentIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M4 5H20V16H9L5 19.5V16H4V5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+  }
+
+  const GUEST_CAPACITY = 8; // 3BR unit — confirm your listed max occupancy to adjust water bottle count
+
+  const SUPPLY_ITEMS = [
+    'Toilet paper',
+    'Paper towels',
+    'Coffee pods / grounds',
+    'Tea bags',
+    'Dish soap',
+    'Hand soap / shampoo / conditioner / body wash',
+    'Laundry detergent',
+    'All-purpose cleaner',
+    'Glass cleaner',
+    'Disinfecting wipes',
+    'Trash bags',
+    'Light bulbs',
+    'Spare batteries (locks/detectors)',
+  ];
+
+  function supplySection(prefix, titlePrefix){
+    return {
+      key: prefix + 'supply',
+      title: titlePrefix + "Owner's Closet — Supply Check",
+      items: SUPPLY_ITEMS.map(item => `${item} — check stock, flag below if running low`),
+    };
+  }
+
+  function buildUnitSections(prefix, labelPrefix, unitId){
+    const bedroomItems = [
+      'Fresh linens on bed, corners tight',
+      'Make the bed carefully — check thoroughly for any stray hairs in the bedding',
+      'Fluff pillows, fold throw blanket',
+      'Place fresh towels for each guest on the bed — folded or rolled',
+      'Wipe/dust nightstands, lamps & desk with multi-surface cleaner',
+      'Clean windows & glass surfaces — check for smudges, fingerprints, dirt',
+      'Swiffer floor (wet, then dry)',
+      'Check under bed, chairs & desk — bugs, dust, or guest items left behind',
+      'Check all drawers for items left behind',
+      'Photograph bedroom',
+    ];
+
+    function bathItems(tubShower){
+      return [
+        tubShower ? 'Clean toilet, tub/shower, sink, mirror' : 'Clean toilet, shower, sink, mirror',
+        'Hang a clean bath mat on the towel rack',
+        'Dust check (vents, light fixtures)',
+        'Clean mirrors — check for smudges, water spots, toothpaste splatter',
+        'Disinfect toilet — seat, under the seat, base, AND scrub bowl fully clean (check under rim & waterline for residue)',
+        tubShower ? 'Clean bathtub/shower floor & walls' : 'Clean shower floor & walls',
+        'Ensure no hair left in tub/shower',
+        'Clean shower door/curtain — check glass for smudges, soap scum',
+        'Clean vanity with multi-purpose cleaner — including water/splashes on the sides',
+        'Swiffer floor (wet, then dry)',
+        'Restock toilet paper — 2 rolls (1 loaded, 1 spare)',
+        'Restock hand soap, shampoo, conditioner, body wash — 1 full bottle each',
+        'Empty trash — double-bag: put a fresh liner in with a spare already loaded underneath',
+        'Photograph bathroom',
+      ];
+    }
+
+    const kitchenItems = [
+      'All dishes washed, dried & put away',
+      'Wipe counters, stove, microwave',
+      'Check refrigerator — clean as needed, confirm empty of prior guest food',
+      'Clean windows & glass surfaces — check for smudges, fingerprints, dirt',
+      `Stock water bottles — 1 per guest (currently set for ${GUEST_CAPACITY} guests)`,
+      'Clean Brita pitcher, refill',
+      'Empty coffee pot / tea kettle / Keurig reservoir, dry & put away — if left upside down in the drying rack to dry, flag this item so it gets put away later',
+      'Check oven & coffee bar, clean as needed',
+      'Restock coffee — enough for ~4 pots (bag or 8 pods)',
+      'Restock dish soap (at least half full) & paper towels (1 full roll)',
+      'Restock trash bags — leave 3 spares under sink',
+      'Take out trash & recycling — double-bag: put a fresh liner in with a spare already loaded underneath',
+      'Photograph kitchen',
+    ];
+
+    function livingItems(extra){
+      const base = [
+        'Vacuum/sweep & mop all floors',
+        'Check couch for dust or stray items — clean as needed',
+        'Check fabric furniture & rugs for stains — treat as needed',
+        'Clean tables',
+        'Clean windows & glass doors — check for smudges, fingerprints, dirt',
+        'Dust surfaces, TV, shelves',
+        'Straighten furniture & throw pillows',
+        'Wipe down light switches & door handles',
+      ];
+      if (extra) base.push(...extra);
+      base.push('Photograph living room');
+      return base;
+    }
+
+    const deckItems = [
+      'Deck swept, furniture straightened & wiped down',
+      'LED string lights working, no bulbs out',
+      'No trash or debris left on deck',
+      'Photograph deck',
+    ];
+
+    const sections = [
+      { key: prefix + 'strip', title: labelPrefix + 'Strip & Laundry',
+        subtitle: 'Laundry pickup is usually at noon on check-out day — do this first',
+        items: [
+        'Strip all beds, place linens with the pickup laundry',
+        'Collect all used towels, place with the pickup laundry',
+        'Check hangers/towel racks (including behind doors) in bedrooms & bathrooms for leftover dirty towels — add to pickup laundry',
+        'Bag laundry for laundry service pick-up',
+        'Set laundry on the bench outside for pickup',
+        'Pull fresh linens & towels for this turn from stock',
+      ]},
+      { key: prefix + 'floor-up', divider: true, label: labelPrefix + 'Upstairs' },
+      { key: prefix + 'kitchen', title: labelPrefix + 'Kitchen', items: kitchenItems },
+      { key: prefix + 'living-up', title: labelPrefix + 'Living Room 1 (Upstairs)', items: livingItems() },
+      { key: prefix + 'bath1', title: labelPrefix + 'Bathroom 1 (Tub/Shower)', items: bathItems(true) },
+      { key: prefix + 'bed1', title: labelPrefix + 'Bedroom 1', items: bedroomItems },
+      { key: prefix + 'bed2', title: labelPrefix + 'Bedroom 2', items: bedroomItems },
+      { key: prefix + 'floor-down', divider: true, label: labelPrefix + 'Downstairs' },
+      { key: prefix + 'bed3', title: labelPrefix + 'Bedroom 3', items: bedroomItems },
+      { key: prefix + 'bath2', title: labelPrefix + 'Bathroom 2 (Shower Only)', items: bathItems(false) },
+      { key: prefix + 'living-down', title: labelPrefix + 'Living Room 2 (Downstairs)', items: livingItems([
+        'Vacuum stairs & entryway',
+        'Check area behind the front door for cobwebs, dust, etc.',
+      ]) },
+      { key: prefix + 'deck', title: labelPrefix + 'Deck', items: deckItems },
+    ];
+
+    if (unitId === 'A') {
+      sections[0].items.push('Empty in-unit washer/dryer lint trap');
+    }
+
+    return sections;
+  }
+
+  function buildFinalSection(prefix, labelPrefix){
+    return {
+      key: prefix + 'final', title: labelPrefix + 'Final Walkthrough', items: [
+        'Walk every room for damage or missing items — flag anything found',
+        'Confirm a photo was captured in every room this turnover',
+        'All windows & doors locked',
+        'Porch/entry light switch left ON — it\'s a dawn-to-dusk sensor, so it may flick on briefly then off if it\'s still daylight (that\'s normal); welcome mat straight',
+      ],
+    };
+  }
+
+  function sectionsFor(unit){
+    if (unit === 'A') return [...buildUnitSections('', '', 'A'), supplySection('', ''), buildFinalSection('', '')];
+    if (unit === 'B') return [...buildUnitSections('', '', 'B'), supplySection('', ''), buildFinalSection('', '')];
+
+    // DUPLEX: full room-by-room checklist for BOTH units (guests use the whole property),
+    // plus the shared backyard and a combined final check.
+    const unitASections = [...buildUnitSections('a-', 'Unit A — ', 'A'), buildFinalSection('a-', 'Unit A — ')];
+    const unitBSections = [...buildUnitSections('b-', 'Unit B — ', 'B'), buildFinalSection('b-', 'Unit B — ')];
+
+    const sharedBackyard = { key: 'shared-backyard', title: 'Shared Backyard', items: [
+      'Shared driveway & walkway clear of debris',
+      'Yard tidy, no trash near either deck',
+      'LED string lights working, no bulbs out',
+      'Photograph shared backyard',
+    ]};
+
+    const dualUnitFinal = { key: 'duplex-final', title: 'Whole-Duplex Final Check', items: [
+      'Confirm both Unit A and Unit B fully turned',
+      'Both kitchens stocked and matching standard',
+      'Shared backyard presentable for full-property guest',
+    ]};
+
+    // one shared supply check, not duplicated per unit — it's the same closet.
+    // Whole-Duplex Final Check is the true last step of the whole property turn.
+    return [...unitASections, ...unitBSections, sharedBackyard, supplySection('shared-', 'Shared '), dualUnitFinal];
+  }
+
+  function deepCleanSectionsFor(unit){
+    const base = [
+      { key: 'dc-kitchen', title: 'Kitchen — Deep Clean', items: [
+        'Clean inside oven & microwave',
+        'Degrease range hood/filter',
+        'Descale coffee maker & kettle',
+        'Wipe down cabinet fronts & interiors',
+        'Check pantry/cabinet items for expiration, clear out',
+        'Pull out fridge, clean underneath/behind if accessible',
+      ]},
+      { key: 'dc-bath', title: 'Bathrooms — Deep Clean', items: [
+        'Scrub grout & tile, treat mildew',
+        'Descale showerhead & faucets',
+        'Clean exhaust fan cover',
+        'Check caulking around tub/shower for gaps',
+        'Scrub toilet bowl fully clean — under the rim and at the waterline, no residue or staining',
+      ]},
+      { key: 'dc-bed', title: 'Bedrooms — Deep Clean', items: [
+        'Rotate/flip mattresses',
+        'Wash mattress protectors & pillow shams',
+        'Dust blinds, baseboards, ceiling corners',
+        'Vacuum under bed & behind furniture',
+      ]},
+      { key: 'dc-living', title: 'Living / Common — Deep Clean', items: [
+        'Wash interior window glass, glass doors & mirrors throughout — check for smudges, fingerprints, dirt',
+        'Dust ceiling fans & vents',
+        'Wipe all baseboards',
+        'Spot-treat upholstery & rugs',
+        'Vacuum under furniture cushions',
+        'Deep vacuum stairs & entryway',
+        'Check area behind the front door for cobwebs, dust, etc.',
+      ]},
+      { key: 'dc-safety', title: 'HVAC & Safety', items: [
+        'Replace/check HVAC air filter',
+        'Test smoke detectors, replace batteries',
+        'Test CO detector, replace batteries',
+        'Check fire extinguisher present & charged',
+      ]},
+      { key: 'dc-tech', title: 'Smart Home & Access', items: [
+        'Replace batteries in Yale lock(s)',
+        'Audit lock code list, remove stale codes',
+        'Ecobee: verify schedule & wifi connection (Unit B)',
+      ]},
+      { key: 'dc-exterior', title: 'Exterior / Patio', items: unit === 'DUPLEX' ? [
+        'Deep clean both decks/patios & furniture',
+        'Inspect LED string lights & wiring for wear',
+        'Check gravel/landscaping condition, note overgrowth',
+        'Wash exterior-facing windows',
+        'Check driveway pest treatment area (void seals holding)',
+      ] : [
+        'Deep clean deck/patio surface & furniture',
+        'Inspect LED string lights & wiring for wear',
+        'Wash exterior-facing windows',
+      ]},
+      { key: 'dc-inventory', title: 'Inventory & Condition', items: [
+        'Confirm full par stock: 2 TP rolls/bath, 1 full soap/shampoo/conditioner/body wash each, coffee for ~4 pots, 1 paper towel roll, 3 spare trash bags',
+        'Check linens/towels for wear, replace if needed',
+        'Photograph full property for condition record',
+        'Log anything for the maintenance backlog — flag below',
+      ]},
+    ];
+    if (unit === 'DUPLEX') {
+      base.push({ key: 'dc-duplex-extra', title: 'Dual-Unit Check', items: [
+        'Confirm both units meet the same deep-clean standard',
+        'Shared exterior areas fully addressed',
+      ]});
+      base.push(supplySection('shared-dc-', 'Shared '));
+    } else {
+      base.push(supplySection('dc-', ''));
+    }
+    return base;
+  }
+
+  const INTRO_EN = `
+    <p><b>Welcome! Quick guide before you start:</b></p>
+    <p>Work through each section top to bottom — tap a section to expand or collapse it.</p>
+    <p>Check off each item individually as you finish it — there's no "check all" shortcut, so every item needs its own tap.</p>
+    <p>💬 <b>Comment icon</b> on each item = a shared thread with Steve. If Steve left a standing note (like a bed configuration), you'll see it there. Add your own reply if something needs his attention — that's what shows up in his summary, no separate "flag" step needed.</p>
+    <p>🐛 <b>Bug icon</b> in each section's header (not on individual items) = report evidence of a pest anywhere in that room — add a note and a photo right there.</p>
+    <p>📸 <b>Camera</b> on "Photograph" items opens your phone's camera directly — snap the photo required for that room.</p>
+    <p>"View example" shows a reference photo for tricky standards (like towel folding) once Steve adds real photos.</p>
+    <p>Items marked <span class="bkc-critical-tag">CRITICAL</span> have caused real guest complaints before — don't rush these.</p>
+    <p>The "Notes for Steve" box at the top is for anything else worth mentioning.</p>
+    <p>"Submit Report" is a demo for now — it doesn't send anything yet.</p>
+    <p>"Start new turnover" resets everything — only use it when starting a completely fresh cleaning.</p>
+  `;
+  const INTRO_ES = `
+    <p><b>¡Bienvenido/a! Guía rápida antes de empezar:</b></p>
+    <p>Trabaja cada sección de arriba hacia abajo — toca una sección para expandirla o contraerla.</p>
+    <p>Marca cada artículo individualmente al terminarlo — no hay un atajo de "marcar todo", cada artículo necesita su propio toque.</p>
+    <p>💬 <b>Ícono de comentario</b> en cada artículo = un hilo compartido con Steve. Si Steve dejó una nota permanente (como una configuración de cama), la verás ahí. Agrega tu propia respuesta si algo necesita su atención — eso es lo que aparece en su resumen, sin necesidad de un paso de "marcar" aparte.</p>
+    <p>🐛 <b>Ícono de insecto</b> en el encabezado de cada sección (no en cada artículo) = reporta evidencia de una plaga en cualquier parte de esa habitación — agrega una nota y una foto ahí mismo.</p>
+    <p>📸 <b>Cámara</b> en los artículos de "Fotografiar" abre la cámara de tu teléfono directamente — toma la foto requerida para esa habitación.</p>
+    <p>"Ver ejemplo" muestra una foto de referencia para estándares difíciles de describir (como el doblado de toallas) una vez que Steve agregue fotos reales.</p>
+    <p>Los artículos marcados como <span class="bkc-critical-tag">CRÍTICO</span> han causado quejas reales de huéspedes antes — no te apresures con estos.</p>
+    <p>El cuadro de "Notas para Steve" arriba es para cualquier otra cosa que valga la pena mencionar.</p>
+    <p>"Enviar Reporte" es solo una demostración por ahora — todavía no envía nada.</p>
+    <p>"Iniciar nueva limpieza" reinicia todo — úsalo solo cuando empieces una limpieza completamente nueva.</p>
+  `;
+
+
+  function renderHelpPanel(){
+    const panel = document.getElementById('bkcHelpPanel');
+    panel.className = 'bkc-home-panel' + (state.showHelp ? ' show' : '');
+    panel.innerHTML = '';
+    if (!state.showHelp) return;
+
+    const closeRow = document.createElement('div');
+    closeRow.className = 'bkc-panel-close-row';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'bkc-panel-close';
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = () => { state.showHelp = false; renderHelpPanel(); };
+    closeRow.appendChild(closeBtn);
+    panel.appendChild(closeRow);
+
+    const content = document.createElement('div');
+    content.innerHTML = state.language === 'es' ? INTRO_ES : INTRO_EN;
+    panel.appendChild(content);
+  }
+
+  function today(){
+    const d = new Date();
+    return d.toISOString().slice(0,10);
+  }
+
+  const DEEP_CLEAN_MONTHS = [1, 4, 7, 10]; // Feb, May, Aug, Nov (0-indexed)
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function nextDeepCleanLabel(){
+    const now = new Date();
+    const curMonth = now.getMonth();
+    const curYear = now.getFullYear();
+    let targetMonth = DEEP_CLEAN_MONTHS.find(m => m > curMonth);
+    let targetYear = curYear;
+    if (targetMonth === undefined) {
+      targetMonth = DEEP_CLEAN_MONTHS[0];
+      targetYear = curYear + 1;
+    }
+    const names = state.language === 'es' ? MONTH_NAMES_ES : MONTH_NAMES;
+    const thisMonthSuffix = state.language === 'es' ? '(este mes)' : '(this month)';
+    // if current month IS a deep-clean month, treat this month as due now
+    if (DEEP_CLEAN_MONTHS.includes(curMonth)) {
+      return `${names[curMonth]} ${curYear} ${thisMonthSuffix}`;
+    }
+    return `${names[targetMonth]} ${targetYear}`;
+  }
+
+  const state = {
+    unit: 'A',
+    type: 'turnover',
+    sessionDate: today(),
+    checklist: {}, // key -> { done, comment }
+    collapsedSections: {},
+    photos: {}, // key -> compressed base64 data URL — persisted as part of the session record
+    generalNotes: '',
+    cleanerName: '', // who's doing this turnover — included in the archived record
+    ownerNotes: {}, // key -> note text — persists across turnovers, not tied to session date
+    editingOwnerNoteKey: null, // transient UI state, not persisted
+    editingCommentKey: null, // transient UI state, not persisted — which item's comment thread is open
+    refPhotoOpen: {}, // transient UI state, not persisted
+    sectionPest: {}, // key -> { active, note } — pest reports, one per SECTION (not per item), session-scoped like checklist
+    editingPestSection: null, // transient UI state, not persisted
+    language: 'en', // 'en' | 'es' — personal device preference, loaded/saved separately
+    showAddToHome: false, // transient UI state, not persisted
+    showHelp: false, // transient UI state, not persisted (but defaults true on first-ever visit)
+    showPasscodeModal: false, // transient UI state, not persisted
+    passcodeInput: '',
+    passcodeError: false,
+    showArchivePanel: false, // transient UI state, not persisted
+    archiveList: [], // loaded on demand when the archive panel opens
+  };
+
+  // ---- Translation layer -------------------------------------------------
+  // English item/title text is the single source of truth (used as dictionary keys
+  // and as the canonical id for "critical item" matching). Spanish is looked up at render time.
+
+  const ITEM_ES = {
+    'Strip all beds, place linens with the pickup laundry': 'Quitar toda la ropa de cama y colocarla con la lavandería de recogida',
+    'Collect all used towels, place with the pickup laundry': 'Recoger todas las toallas usadas y colocarlas con la lavandería de recogida',
+    'Check hangers/towel racks (including behind doors) in bedrooms & bathrooms for leftover dirty towels — add to pickup laundry': 'Revisar ganchos/toalleros (incluyendo detrás de las puertas) en dormitorios y baños por toallas sucias olvidadas — agregarlas a la lavandería de recogida',
+    'Pull fresh linens & towels for this turn from stock': 'Sacar sábanas y toallas limpias del inventario para esta limpieza',
+    'Bag laundry for laundry service pick-up': 'Embolsar la ropa para la recogida del servicio de lavandería',
+    'Set laundry on the bench outside for pickup': 'Dejar la ropa en la banca de afuera para la recogida',
+    'Empty in-unit washer/dryer lint trap': 'Vaciar el filtro de pelusa de la lavadora/secadora de la unidad',
+    'All dishes washed, dried & put away': 'Lavar, secar y guardar todos los platos',
+    'Wipe counters, stove, microwave': 'Limpiar las encimeras, la estufa y el microondas',
+    'Check refrigerator — clean as needed, confirm empty of prior guest food': 'Revisar el refrigerador — limpiar si es necesario y confirmar que no quede comida del huésped anterior',
+    'Clean windows & glass surfaces — check for smudges, fingerprints, dirt': 'Limpiar ventanas y superficies de vidrio — revisar manchas, huellas y suciedad',
+    'Clean Brita pitcher, refill': 'Limpiar la jarra Brita y rellenarla',
+    'Empty coffee pot / tea kettle / Keurig reservoir, dry & put away — if left upside down in the drying rack to dry, flag this item so it gets put away later': 'Vaciar la cafetera / tetera / depósito de la Keurig, secar y guardar — si se deja boca abajo en el escurridor para secarse, marcar este artículo para guardarlo después',
+    'Check oven & coffee bar, clean as needed': 'Revisar el horno y la barra de café — limpiar si es necesario',
+    'Restock coffee — enough for ~4 pots (bag or 8 pods)': 'Reponer café — suficiente para ~4 cafeteras (una bolsa u 8 cápsulas)',
+    'Restock dish soap (at least half full) & paper towels (1 full roll)': 'Reponer jabón lavavajillas (al menos medio lleno) y toallas de papel (1 rollo completo)',
+    'Restock trash bags — leave 3 spares under sink': 'Reponer bolsas de basura — dejar 3 de repuesto bajo el fregadero',
+    'Take out trash & recycling — double-bag: put a fresh liner in with a spare already loaded underneath': 'Sacar la basura y el reciclaje — embolsar doble: poner una bolsa nueva con una de repuesto ya colocada debajo',
+    'Photograph kitchen': 'Fotografiar la cocina',
+    'Vacuum/sweep & mop all floors': 'Aspirar/barrer y trapear todos los pisos',
+    'Check couch for dust or stray items — clean as needed': 'Revisar el sofá por polvo u objetos olvidados — limpiar si es necesario',
+    'Check fabric furniture & rugs for stains — treat as needed': 'Revisar muebles de tela y alfombras por manchas — tratarlas si es necesario',
+    'Clean tables': 'Limpiar las mesas',
+    'Clean windows & glass doors — check for smudges, fingerprints, dirt': 'Limpiar ventanas y puertas de vidrio — revisar manchas, huellas y suciedad',
+    'Dust surfaces, TV, shelves': 'Quitar el polvo de superficies, TV y repisas',
+    'Straighten furniture & throw pillows': 'Acomodar los muebles y los cojines decorativos',
+    'Wipe down light switches & door handles': 'Limpiar los interruptores de luz y las manijas de las puertas',
+    'Photograph living room': 'Fotografiar la sala',
+    'Clean toilet, tub/shower, sink, mirror': 'Limpiar el inodoro, la tina/ducha, el lavabo y el espejo',
+    'Hang a clean bath mat on the towel rack': 'Colgar un tapete de baño limpio en el toallero',
+    'Dust check (vents, light fixtures)': 'Revisar el polvo (rejillas de ventilación, luces)',
+    'Clean mirrors — check for smudges, water spots, toothpaste splatter': 'Limpiar los espejos — revisar manchas, marcas de agua y salpicaduras de pasta dental',
+    'Disinfect toilet — seat, under the seat, base, AND scrub bowl fully clean (check under rim & waterline for residue)': 'Desinfectar el inodoro — el asiento, debajo del asiento, la base, Y tallar bien la taza (revisar debajo del borde y en la línea del agua por residuos)',
+    'Clean bathtub/shower floor & walls': 'Limpiar el piso y las paredes de la tina/ducha',
+    'Ensure no hair left in tub/shower': 'Asegurarse de que no quede cabello en la tina/ducha',
+    'Clean shower door/curtain — check glass for smudges, soap scum': 'Limpiar la puerta/cortina de la ducha — revisar el vidrio por manchas y residuos de jabón',
+    'Clean vanity with multi-purpose cleaner — including water/splashes on the sides': 'Limpiar el tocador con limpiador multiusos — incluyendo salpicaduras de agua en los lados',
+    'Swiffer floor (wet, then dry)': 'Trapear el piso con Swiffer (húmedo y luego seco)',
+    'Restock toilet paper — 2 rolls (1 loaded, 1 spare)': 'Reponer papel higiénico — 2 rollos (1 puesto, 1 de repuesto)',
+    'Restock hand soap, shampoo, conditioner, body wash — 1 full bottle each': 'Reponer jabón de manos, champú, acondicionador y gel de baño — 1 botella completa de cada uno',
+    'Empty trash — double-bag: put a fresh liner in with a spare already loaded underneath': 'Vaciar la basura — embolsar doble: poner una bolsa nueva con una de repuesto ya colocada debajo',
+    'Photograph bathroom': 'Fotografiar el baño',
+    'Fresh linens on bed, corners tight': 'Poner sábanas limpias en la cama, esquinas bien ajustadas',
+    'Make the bed carefully — check thoroughly for any stray hairs in the bedding': 'Hacer la cama con cuidado — revisar bien que no haya cabellos sueltos en la ropa de cama',
+    'Fluff pillows, fold throw blanket': 'Esponjar las almohadas y doblar la manta decorativa',
+    'Place fresh towels for each guest on the bed — folded or rolled': 'Colocar toallas limpias para cada huésped sobre la cama — dobladas o enrolladas',
+    'Wipe/dust nightstands, lamps & desk with multi-surface cleaner': 'Limpiar/quitar el polvo de las mesitas de noche, lámparas y escritorio con limpiador multiusos',
+    'Check under bed, chairs & desk — bugs, dust, or guest items left behind': 'Revisar debajo de la cama, sillas y escritorio — insectos, polvo u objetos olvidados por el huésped',
+    'Check all drawers for items left behind': 'Revisar todos los cajones por objetos olvidados',
+    'Photograph bedroom': 'Fotografiar la habitación',
+    'Clean toilet, shower, sink, mirror': 'Limpiar el inodoro, la ducha, el lavabo y el espejo',
+    'Clean shower floor & walls': 'Limpiar el piso y las paredes de la ducha',
+    'Vacuum stairs & entryway': 'Aspirar las escaleras y la entrada',
+    'Check area behind the front door for cobwebs, dust, etc.': 'Revisar el área detrás de la puerta principal por telarañas, polvo, etc.',
+    'Deck swept, furniture straightened & wiped down': 'Barrer la terraza, acomodar y limpiar los muebles',
+    'LED string lights working, no bulbs out': 'Revisar que las luces LED funcionen, sin bombillas fundidas',
+    'No trash or debris left on deck': 'Sin basura ni escombros en la terraza',
+    'Photograph deck': 'Fotografiar la terraza',
+    'Toilet paper — check stock, flag below if running low': 'Papel higiénico — revisar existencia, marcar abajo si está por acabarse',
+    'Paper towels — check stock, flag below if running low': 'Toallas de papel — revisar existencia, marcar abajo si está por acabarse',
+    'Coffee pods / grounds — check stock, flag below if running low': 'Cápsulas / café molido — revisar existencia, marcar abajo si está por acabarse',
+    'Tea bags — check stock, flag below if running low': 'Bolsitas de té — revisar existencia, marcar abajo si está por acabarse',
+    'Dish soap — check stock, flag below if running low': 'Jabón lavavajillas — revisar existencia, marcar abajo si está por acabarse',
+    'Hand soap / shampoo / conditioner / body wash — check stock, flag below if running low': 'Jabón de manos / champú / acondicionador / gel de baño — revisar existencia, marcar abajo si está por acabarse',
+    'Laundry detergent — check stock, flag below if running low': 'Detergente para ropa — revisar existencia, marcar abajo si está por acabarse',
+    'All-purpose cleaner — check stock, flag below if running low': 'Limpiador multiusos — revisar existencia, marcar abajo si está por acabarse',
+    'Glass cleaner — check stock, flag below if running low': 'Limpiador de vidrios — revisar existencia, marcar abajo si está por acabarse',
+    'Disinfecting wipes — check stock, flag below if running low': 'Toallitas desinfectantes — revisar existencia, marcar abajo si está por acabarse',
+    'Trash bags — check stock, flag below if running low': 'Bolsas de basura — revisar existencia, marcar abajo si está por acabarse',
+    'Light bulbs — check stock, flag below if running low': 'Bombillas — revisar existencia, marcar abajo si está por acabarse',
+    'Spare batteries (locks/detectors) — check stock, flag below if running low': 'Baterías de repuesto (cerraduras/detectores) — revisar existencia, marcar abajo si está por acabarse',
+    'Walk every room for damage or missing items — flag anything found': 'Recorrer cada habitación buscando daños u objetos faltantes — marcar cualquier hallazgo',
+    'Confirm a photo was captured in every room this turnover': 'Confirmar que se tomó una foto en cada habitación durante esta limpieza',
+    'All windows & doors locked': 'Todas las ventanas y puertas con seguro',
+    "Porch/entry light switch left ON — it's a dawn-to-dusk sensor, so it may flick on briefly then off if it's still daylight (that's normal); welcome mat straight": 'Interruptor de la luz del porche/entrada dejado en ENCENDIDO — es un sensor de amanecer a anochecer, así que puede encenderse brevemente y apagarse si todavía hay luz de día (esto es normal); tapete de bienvenida derecho',
+    'Shared driveway & walkway clear of debris': 'Entrada y camino compartidos libres de escombros',
+    'Yard tidy, no trash near either deck': 'Patio ordenado, sin basura cerca de ninguna terraza',
+    'Photograph shared backyard': 'Fotografiar el patio compartido',
+    'Confirm both Unit A and Unit B fully turned': 'Confirmar que la Unidad A y la Unidad B estén completamente listas',
+    'Both kitchens stocked and matching standard': 'Ambas cocinas abastecidas y con el mismo estándar',
+    'Shared backyard presentable for full-property guest': 'Patio compartido presentable para el huésped de toda la propiedad',
+    'Clean inside oven & microwave': 'Limpiar el interior del horno y el microondas',
+    'Degrease range hood/filter': 'Desengrasar la campana extractora/filtro',
+    'Descale coffee maker & kettle': 'Desincrustar la cafetera y la tetera',
+    'Wipe down cabinet fronts & interiors': 'Limpiar el frente y el interior de los gabinetes',
+    'Check pantry/cabinet items for expiration, clear out': 'Revisar la despensa/gabinetes por productos vencidos y retirarlos',
+    'Pull out fridge, clean underneath/behind if accessible': 'Sacar el refrigerador y limpiar debajo/detrás si es posible',
+    'Scrub grout & tile, treat mildew': 'Tallar el azulejo y la lechada, tratar el moho',
+    'Descale showerhead & faucets': 'Desincrustar la regadera y los grifos',
+    'Clean exhaust fan cover': 'Limpiar la cubierta del extractor',
+    'Check caulking around tub/shower for gaps': 'Revisar el sellador alrededor de la tina/ducha por grietas',
+    'Scrub toilet bowl fully clean — under the rim and at the waterline, no residue or staining': 'Tallar la taza del inodoro hasta quedar totalmente limpia — debajo del borde y en la línea del agua, sin residuos ni manchas',
+    'Rotate/flip mattresses': 'Rotar/voltear los colchones',
+    'Wash mattress protectors & pillow shams': 'Lavar los protectores de colchón y las fundas decorativas de almohada',
+    'Dust blinds, baseboards, ceiling corners': 'Quitar el polvo de las persianas, zócalos y esquinas del techo',
+    'Vacuum under bed & behind furniture': 'Aspirar debajo de la cama y detrás de los muebles',
+    'Wash interior window glass, glass doors & mirrors throughout — check for smudges, fingerprints, dirt': 'Lavar los vidrios de ventanas, puertas de vidrio y espejos en toda la unidad — revisar manchas, huellas y suciedad',
+    'Dust ceiling fans & vents': 'Quitar el polvo de los ventiladores de techo y rejillas de ventilación',
+    'Wipe all baseboards': 'Limpiar todos los zócalos',
+    'Spot-treat upholstery & rugs': 'Tratar manchas en tapicería y alfombras',
+    'Vacuum under furniture cushions': 'Aspirar debajo de los cojines de los muebles',
+    'Deep vacuum stairs & entryway': 'Aspirar a fondo las escaleras y la entrada',
+    'Replace/check HVAC air filter': 'Reemplazar/revisar el filtro de aire del HVAC',
+    'Test smoke detectors, replace batteries': 'Probar los detectores de humo y cambiar las baterías',
+    'Test CO detector, replace batteries': 'Probar el detector de monóxido de carbono y cambiar las baterías',
+    'Check fire extinguisher present & charged': 'Revisar que el extintor esté presente y cargado',
+    'Replace batteries in Yale lock(s)': 'Cambiar las baterías de la(s) cerradura(s) Yale',
+    'Audit lock code list, remove stale codes': 'Revisar la lista de códigos de la cerradura y eliminar los códigos vencidos',
+    'Ecobee: verify schedule & wifi connection (Unit B)': 'Ecobee: verificar el horario y la conexión wifi (Unidad B)',
+    'Deep clean deck/patio surface & furniture': 'Limpieza profunda de la superficie y muebles de la terraza',
+    'Inspect LED string lights & wiring for wear': 'Inspeccionar las luces LED y el cableado por desgaste',
+    'Wash exterior-facing windows': 'Lavar las ventanas que dan al exterior',
+    'Confirm full par stock: 2 TP rolls/bath, 1 full soap/shampoo/conditioner/body wash each, coffee for ~4 pots, 1 paper towel roll, 3 spare trash bags': 'Confirmar existencia completa: 2 rollos de papel higiénico por baño, 1 botella completa de jabón/champú/acondicionador/gel de baño cada uno, café para ~4 cafeteras, 1 rollo de toallas de papel, 3 bolsas de basura de repuesto',
+    'Check linens/towels for wear, replace if needed': 'Revisar sábanas y toallas por desgaste, reemplazar si es necesario',
+    'Photograph full property for condition record': 'Fotografiar toda la propiedad para el registro de condición',
+    'Log anything for the maintenance backlog — flag below': 'Anotar cualquier pendiente de mantenimiento — marcar abajo',
+    'Deep clean both decks/patios & furniture': 'Limpieza profunda de ambas terrazas y muebles',
+    'Check gravel/landscaping condition, note overgrowth': 'Revisar el estado de la grava/jardín, anotar si hay maleza',
+    'Check driveway pest treatment area (void seals holding)': 'Revisar el área de tratamiento contra plagas en la entrada (que los sellos sigan intactos)',
+    'Confirm both units meet the same deep-clean standard': 'Confirmar que ambas unidades cumplan el mismo estándar de limpieza profunda',
+    'Shared exterior areas fully addressed': 'Áreas exteriores compartidas completamente atendidas',
+  };
+
+  function translateWaterBottleItem(text){
+    const m = text.match(/^Stock water bottles — 1 per guest \(currently set for (\d+) guests\)$/);
+    if (m) return `Reponer botellas de agua — 1 por huésped (actualmente configurado para ${m[1]} huéspedes)`;
+    return null;
+  }
+
+  function translateItem(text){
+    if (state.language !== 'es') return text;
+    return translateWaterBottleItem(text) || ITEM_ES[text] || text;
+  }
+
+  const TITLE_ES_BASE = {
+    'Strip & Laundry': 'Ropa Sucia y Lavandería',
+    'Upstairs': 'Piso de Arriba',
+    'Kitchen': 'Cocina',
+    'Living Room 1 (Upstairs)': 'Sala 1 (Piso de Arriba)',
+    'Bathroom 1 (Tub/Shower)': 'Baño 1 (Tina/Ducha)',
+    'Bedroom 1': 'Dormitorio 1',
+    'Bedroom 2': 'Dormitorio 2',
+    'Downstairs': 'Piso de Abajo',
+    'Bedroom 3': 'Dormitorio 3',
+    'Bathroom 2 (Shower Only)': 'Baño 2 (Solo Ducha)',
+    'Living Room 2 (Downstairs)': 'Sala 2 (Piso de Abajo)',
+    'Deck': 'Terraza',
+    "Owner's Closet — Supply Check": 'Clóset del Propietario — Revisión de Suministros',
+    'Final Walkthrough': 'Recorrido Final',
+    'Kitchen — Deep Clean': 'Cocina — Limpieza Profunda',
+    'Bathrooms — Deep Clean': 'Baños — Limpieza Profunda',
+    'Bedrooms — Deep Clean': 'Dormitorios — Limpieza Profunda',
+    'Living / Common — Deep Clean': 'Sala / Áreas Comunes — Limpieza Profunda',
+    'HVAC & Safety': 'Climatización y Seguridad',
+    'Smart Home & Access': 'Casa Inteligente y Acceso',
+    'Exterior / Patio': 'Exterior / Terraza',
+    'Inventory & Condition': 'Inventario y Condición',
+  };
+  const TITLE_ES_EXACT = {
+    'Shared Backyard': 'Patio Trasero Compartido',
+    "Shared Owner's Closet — Supply Check": 'Clóset del Propietario Compartido — Revisión de Suministros',
+    'Whole-Duplex Final Check': 'Revisión Final de Todo el Dúplex',
+    'Dual-Unit Check': 'Revisión de Ambas Unidades',
+  };
+  const PREFIX_ES = [
+    { en: 'Unit A — ', es: 'Unidad A — ' },
+    { en: 'Unit B — ', es: 'Unidad B — ' },
+  ];
+  const SUBTITLE_ES = {
+    'Laundry pickup is usually at noon on check-out day — do this first': 'La recogida de lavandería suele ser al mediodía el día de salida — hacer esto primero',
+  };
+
+  function translateTitle(title){
+    if (state.language !== 'es') return title;
+    if (TITLE_ES_EXACT[title]) return TITLE_ES_EXACT[title];
+    for (const p of PREFIX_ES) {
+      if (title.startsWith(p.en)) {
+        const rest = title.slice(p.en.length);
+        return p.es + (TITLE_ES_BASE[rest] || rest);
+      }
+    }
+    return TITLE_ES_BASE[title] || title;
+  }
+
+  function translateSubtitle(text){
+    if (state.language !== 'es') return text;
+    return SUBTITLE_ES[text] || text;
+  }
+
+  const UNIT_LABEL_ES = {
+    'Unit A (14104)': 'Unidad A (14104)',
+    'Unit B (14106)': 'Unidad B (14106)',
+    'Whole Duplex': 'Dúplex Completo',
+  };
+  const TYPE_LABEL_ES = {
+    'Turnover': 'Limpieza de Cambio',
+    'Quarterly Deep Clean': 'Limpieza Profunda Trimestral',
+  };
+  const MONTH_NAMES_ES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const REF_CAPTION_ES = {
+    'Example: how towels should be hung/folded for guests': 'Ejemplo: cómo colgar/doblar las toallas para los huéspedes',
+    'Example: bed made & staged for guests': 'Ejemplo: cama hecha y preparada para los huéspedes',
+  };
+  const OWNER_NOTE_ES = {
+    'Bedroom 1 configures to King OR two Twins — check the reservation notes for guest bed preference before making the bed.':
+      'El Dormitorio 1 se puede configurar como cama King o dos camas individuales — revisar las notas de la reserva para la preferencia del huésped antes de hacer la cama.',
+    "Gift baskets are in the owner's closet, top shelf — pick based on the guest's home country if noted in the reservation.":
+      "Las canastas de regalo están en el clóset del propietario, en el estante superior — elegir según el país de origen del huésped si se indica en la reserva.",
+  };
+
+  const UI_ES = {
+    unitLabel: (label) => UNIT_LABEL_ES[label] || label,
+    typeLabel: (label) => TYPE_LABEL_ES[label] || label,
+    refCaption: (c) => REF_CAPTION_ES[c] || c,
+    ownerNote: (n) => OWNER_NOTE_ES[n] || n,
+    startNewTurnover: 'Iniciar nueva limpieza',
+    submitReport: 'Enviar Reporte',
+    demoTag: 'Demo',
+    notesForSteve: 'Notas para Steve',
+    notesPlaceholder: 'Cualquier otra cosa que valga la pena mencionar — escríbela aquí.',
+    whatNeedsAttention: '¿Algo que Steve deba saber? (opcional)',
+    takePhoto: 'Tomar foto',
+    retakePhoto: 'Tomar otra foto',
+    viewExample: 'Ver ejemplo',
+    hideExample: 'Ocultar ejemplo',
+    refPending: 'foto pendiente (agregar después de la sesión de fotos)',
+    noteFromSteve: 'Nota de Steve:',
+    ownerNotePlaceholder: 'Agregar una instrucción permanente para este artículo…',
+    ownerNoteBtnTitle: 'Agregar/editar una nota para el personal de limpieza',
+    loading: 'Cargando lista…',
+    flaggedFor: (n) => `${n} elemento${n === 1 ? '' : 's'} con notas para Steve:`,
+    pestBannerLabel: (n) => `🐛 ${n} reporte${n === 1 ? '' : 's'} de plagas para Steve:`,
+    pestDetected: '🐛 Evidencia de plaga en esta habitación',
+    pestDescribe: '¿Qué encontraste? (tipo, ubicación, cuántos)',
+    pestBtnTitle: 'Reportar evidencia de plagas en esta habitación',
+    pestConfirm: 'Se encontró evidencia de una plaga en esta habitación',
+    commentBtnTitle: 'Ver o agregar una nota — aquí están las instrucciones de Steve y tu respuesta',
+    yourReply: 'Tu respuesta / nota para Steve:',
+    editSteveNote: 'Editar la nota de Steve',
+    addSteveNote: 'Agregar una nota de Steve',
+    doneBtn: 'Listo',
+    completeArchive: 'Completar y Archivar Limpieza',
+    passcodeTitle: 'Ingresa el código para completar esta limpieza',
+    passcodeWrong: 'Código incorrecto — intenta de nuevo.',
+    cancelBtn: 'Cancelar',
+    confirmBtn: 'Confirmar',
+    archivedToast: (when) => `Limpieza archivada (${when}). Lista nueva preparada para la próxima limpieza.`,
+    archiveTitle: (label) => `Limpiezas archivadas — ${label}`,
+    archiveEmpty: 'Todavía no hay registros archivados para esta unidad/tipo.',
+    archiveLoadError: 'No se pudo cargar el registro completo.',
+    uploading: 'Subiendo…',
+    signedInAs: 'Sesión iniciada como',
+    signOut: 'Cerrar sesión',
+    signIn: 'Entrar',
+    loginTitle: 'Inicia sesión para continuar',
+    loginMissingFields: 'Ingresa tu nombre y PIN.',
+    loginRejected: 'Nombre o PIN no reconocido. Pide acceso a Steve.',
+    loginNetworkError: 'No se pudo conectar con el servidor. Revisa tu conexión e intenta de nuevo.',
+    toast: (photoCount, flagCount) => `Solo demostración — no se envía nada. Un envío real le mandaría a Steve este reporte con ${photoCount} foto${photoCount === 1 ? '' : 's'} y ${flagCount} elemento${flagCount === 1 ? '' : 's'} marcado${flagCount === 1 ? '' : 's'}.`,
+    meta: (date, nextDeep) => `Sesión: ${date} · Próxima limpieza profunda: ${nextDeep} · Lista compartida — visible para cualquiera con este enlace`,
+    addToHome: 'Agregar a la pantalla de inicio',
+    addToHomeIOS: "En iPhone/iPad (Safari): toca el botón Compartir (el cuadrado con una flecha hacia arriba), desplázate hacia abajo y toca 'Agregar a pantalla de inicio'.",
+    addToHomeAndroid: "En Android (Chrome): toca el menú ⋮ en la esquina superior derecha, luego toca 'Agregar a pantalla de inicio' o 'Instalar app'.",
+  };
+
+  function uiText(key, ...args){
+    if (state.language !== 'es') return null; // caller falls back to English literal
+    const v = UI_ES[key];
+    return typeof v === 'function' ? v(...args) : v;
+  }
+
+  // ---- Critical items ------------------------------------------------------
+  // A short, deliberately small set — items tied to real guest-facing failures
+  // (like the toilet issue). Keeping this list short is what makes it meaningful.
+  const CRITICAL_ITEMS = new Set([
+    'Disinfect toilet — seat, under the seat, base, AND scrub bowl fully clean (check under rim & waterline for residue)',
+    'Scrub toilet bowl fully clean — under the rim and at the waterline, no residue or staining',
+    'Ensure no hair left in tub/shower',
+    'Make the bed carefully — check thoroughly for any stray hairs in the bedding',
+  ]);
+
+  // Items where a reference photo would help — folded towel display, bed staging, etc.
+  // Placeholder scaffold now; swap in real photos once the shoot is done.
+  const REFERENCE_PHOTO_KEYS = {
+    'bath1::1': 'Example: how towels should be hung/folded for guests',
+    'bath2::1': 'Example: how towels should be hung/folded for guests',
+    'bed1::0': 'Example: bed made & staged for guests',
+    'bed2::0': 'Example: bed made & staged for guests',
+    'bed3::0': 'Example: bed made & staged for guests',
+  };
+
+  // Placeholder passcode — client-side only, so this stops accidental taps, not a determined
+  // person reading the page source. Ask Steve for the real value and swap it in here.
+  const PASSCODE = '9730';
+
+  function buildArchiveRecord(){
+    const flaggedEntries = [];
+    const sections = state.type === 'deep-clean' ? deepCleanSectionsFor(state.unit) : sectionsFor(state.unit);
+    let totalItems = 0, doneItems = 0;
+    sections.forEach(sec => {
+      if (sec.divider) return;
+      sec.items.forEach((text, idx) => {
+        const k = itemKey(sec.key, idx);
+        const entry = state.checklist[k];
+        totalItems++;
+        if (entry && entry.done) doneItems++;
+        if (entry && entry.comment && entry.comment.trim()) {
+          flaggedEntries.push({ section: sec.title, item: text, comment: entry.comment, done: !!(entry && entry.done) });
+        }
+      });
+    });
+    const pestEntries = Object.entries(state.sectionPest)
+      .filter(([, v]) => v && v.active)
+      .map(([sectionKey, v]) => ({ sectionKey, note: v.note || '' }));
+
+    return {
+      unit: state.unit,
+      type: state.type,
+      sessionDate: state.sessionDate,
+      archivedAt: new Date().toISOString(),
+      cleanerName: state.cleanerName || '(not entered)',
+      totalItems,
+      doneItems,
+      generalNotes: state.generalNotes,
+      commentedItems: flaggedEntries,
+      pestReports: pestEntries,
+      photos: state.photos, // { itemKey: publicPhotoUrl } — real, permanent Storage URLs
+    };
+  }
+
+  async function saveArchive(record){
+    const { error } = await sb.from('archives').insert({
+      unit: record.unit,
+      type: record.type,
+      session_date: record.sessionDate,
+      archived_at: record.archivedAt,
+      cleaner_name: record.cleanerName,
+      total_items: record.totalItems,
+      done_items: record.doneItems,
+      general_notes: record.generalNotes,
+      commented_items: record.commentedItems,
+      pest_reports: record.pestReports,
+      photos: record.photos,
+    });
+    if (error) throw error;
+  }
+
+  async function loadArchiveList(){
+    try{
+      const { data, error } = await sb.from('archives')
+        .select('id, archived_at, session_date, cleaner_name, total_items, done_items, commented_items, pest_reports')
+        .eq('unit', state.unit).eq('type', state.type)
+        .order('archived_at', { ascending: false });
+      if (error) throw error;
+      state.archiveList = (data || []).map(row => ({
+        id: row.id,
+        archivedAt: row.archived_at,
+        sessionDate: row.session_date,
+        cleanerName: row.cleaner_name,
+        doneItems: row.done_items,
+        totalItems: row.total_items,
+        commentCount: (row.commented_items || []).length,
+        pestCount: (row.pest_reports || []).length,
+      }));
+    } catch(e){
+      console.error('load archive list failed', e);
+      state.archiveList = [];
+    }
+  }
+
+  async function loadArchiveDetail(id){
+    const { data, error } = await sb.from('archives').select('*').eq('id', id).single();
+    if (error) throw error;
+    return {
+      generalNotes: data.general_notes,
+      commentedItems: data.commented_items || [],
+      pestReports: data.pest_reports || [],
+      photos: data.photos || {},
+    };
+  }
+
+  function defaultOwnerNotes(){
+    // seeded example — persists across turnovers, editable via the pencil icon on any item
+    if (state.type === 'turnover' && (state.unit === 'A' || state.unit === 'B')) {
+      return {
+        'bed1::0': 'Bedroom 1 configures to King OR two Twins — check the reservation notes for guest bed preference before making the bed.',
+      };
+    }
+    return {};
+  }
+
+  async function loadOwnerNotes(){
+    try{
+      const { data, error } = await sb.from('owner_notes')
+        .select('item_key, note_text')
+        .eq('unit', state.unit).eq('type', state.type);
+      if (error) throw error;
+      if (data && data.length) {
+        state.ownerNotes = {};
+        data.forEach(row => { state.ownerNotes[row.item_key] = row.note_text; });
+      } else {
+        // nothing saved yet for this unit/type — seed the default and persist it
+        state.ownerNotes = defaultOwnerNotes();
+        for (const [key, text] of Object.entries(state.ownerNotes)) {
+          await sb.from('owner_notes').upsert(
+            { unit: state.unit, type: state.type, item_key: key, note_text: text },
+            { onConflict: 'unit,type,item_key' }
+          );
+        }
+      }
+    } catch(e){
+      console.error('load owner notes failed', e);
+      state.ownerNotes = defaultOwnerNotes();
+    }
+  }
+
+  const ownerNoteSaveTimers = {};
+  function saveOwnerNote(key, text){
+    clearTimeout(ownerNoteSaveTimers[key]);
+    ownerNoteSaveTimers[key] = setTimeout(async () => {
+      try{
+        await sb.from('owner_notes').upsert(
+          { unit: state.unit, type: state.type, item_key: key, note_text: text, updated_at: new Date().toISOString() },
+          { onConflict: 'unit,type,item_key' }
+        );
+      } catch(e){ console.error('owner note save failed', e); }
+    }, 200);
+  }
+
+  // Language is a personal device preference and this now runs as a real website —
+  // localStorage is the right tool here (no longer inside the Claude-artifact sandbox
+  // that required window.storage for everything, including per-device settings).
+  function loadLanguage(){
+    state.language = localStorage.getItem('bkc-language') || 'en';
+  }
+
+  function saveLanguage(){
+    localStorage.setItem('bkc-language', state.language);
+  }
+
+  async function loadState(){
+    try{
+      const { data, error } = await sb.from('checklist_sessions')
+        .select('*')
+        .eq('unit', state.unit).eq('type', state.type)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) {
+        state.checklist = data.checklist || {};
+        state.collapsedSections = data.collapsed_sections || {};
+        state.generalNotes = data.general_notes || '';
+        state.sectionPest = data.section_pest || {};
+        state.photos = data.photos || {};
+        state.sessionDate = data.session_date || today();
+      } else {
+        state.checklist = {};
+        state.collapsedSections = {};
+        state.generalNotes = '';
+        state.sectionPest = {};
+        state.photos = {};
+        state.sessionDate = today();
+      }
+      // Deliberately NOT setting state.cleanerName here — it reflects whoever is
+      // currently signed in on this device (set at login), not whatever name was
+      // last saved against this unit/type. Chain-of-custody should track the person
+      // acting right now, not the last person who happened to touch this session.
+    } catch(e){
+      console.error('load state failed', e);
+      state.checklist = {};
+      state.collapsedSections = {};
+      state.generalNotes = '';
+      state.sectionPest = {};
+      state.photos = {};
+    }
+    await loadOwnerNotes();
+  }
+
+  let saveTimer = null;
+  function saveState(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      try{
+        const { error } = await sb.from('checklist_sessions').upsert({
+          unit: state.unit,
+          type: state.type,
+          session_date: state.sessionDate,
+          checklist: state.checklist,
+          collapsed_sections: state.collapsedSections,
+          general_notes: state.generalNotes,
+          section_pest: state.sectionPest,
+          cleaner_name: state.cleanerName,
+          photos: state.photos,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'unit,type' });
+        if (error) throw error;
+      } catch(e){ console.error('save failed', e); }
+    }, 200);
+  }
+
+  function itemKey(sectionKey, idx){
+    return sectionKey + '::' + idx;
+  }
+
+  // Resize/compress a captured photo client-side before uploading to Supabase Storage —
+  // keeps uploads fast and cheap. Target: long edge 900px, JPEG quality 0.7.
+  function compressPhotoToBlob(file){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+
+      const reader = new FileReader();
+      reader.onload = (e) => { img.src = e.target.result; };
+      reader.onerror = reject;
+      img.onload = () => {
+        const maxDim = 900;
+        let { width, height } = img;
+        if (width > height && width > maxDim) { height = Math.round(height * (maxDim / width)); width = maxDim; }
+        else if (height > maxDim) { width = Math.round(width * (maxDim / height)); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob); else reject(new Error('canvas toBlob failed'));
+        }, 'image/jpeg', 0.7);
+      };
+      img.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Uploads a compressed photo to the checklist-photos bucket and returns its public URL.
+  // pathPrefix identifies what the photo is of (e.g. 'A/turnover/bath1::1' or 'A/turnover/pest::bath1');
+  // a timestamp is appended so retakes don't overwrite/collide with the previous file.
+  async function uploadPhoto(file, pathPrefix){
+    const blob = await compressPhotoToBlob(file);
+    const path = `${pathPrefix}-${Date.now()}.jpg`;
+    const { error } = await sb.storage.from('checklist-photos').upload(path, blob, {
+      contentType: 'image/jpeg',
+      upsert: true,
+    });
+    if (error) throw error;
+    const { data } = sb.storage.from('checklist-photos').getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  function render(){
+    // header pills
+    const unitWrap = document.getElementById('bkcUnitSelect');
+    unitWrap.innerHTML = '';
+    UNITS.forEach(u => {
+      const btn = document.createElement('button');
+      btn.className = 'bkc-pill' + (state.unit === u.id ? ' active' : '');
+      btn.textContent = state.language === 'es' ? UI_ES.unitLabel(u.label) : u.label;
+      btn.onclick = () => { state.unit = u.id; init(); };
+      unitWrap.appendChild(btn);
+    });
+
+    const typeWrap = document.getElementById('bkcTypeSelect');
+    typeWrap.innerHTML = '';
+    TYPES.forEach(ty => {
+      const btn = document.createElement('button');
+      btn.className = 'bkc-pill' + (state.type === ty.id ? ' active' : '');
+      btn.textContent = state.language === 'es' ? UI_ES.typeLabel(ty.label) : ty.label;
+      btn.onclick = () => { state.type = ty.id; init(); };
+      typeWrap.appendChild(btn);
+    });
+
+    const langWrap = document.getElementById('bkcLangSelect');
+    langWrap.innerHTML = '';
+    [{ id: 'en', label: 'English' }, { id: 'es', label: 'Español' }].forEach(l => {
+      const btn = document.createElement('button');
+      btn.className = 'bkc-pill' + (state.language === l.id ? ' active' : '');
+      btn.textContent = l.label;
+      btn.onclick = () => {
+        state.language = l.id;
+        saveLanguage();
+        render();
+        renderHomePanel();
+        renderHelpPanel();
+      };
+      langWrap.appendChild(btn);
+    });
+
+    const unitLabelRaw = UNITS.find(u => u.id === state.unit).label;
+    const typeLabelRaw = TYPES.find(ty => ty.id === state.type).label;
+    const unitLabel = state.language === 'es' ? UI_ES.unitLabel(unitLabelRaw) : unitLabelRaw;
+    const typeLabel = state.language === 'es' ? UI_ES.typeLabel(typeLabelRaw) : typeLabelRaw;
+    document.getElementById('bkcTitle').textContent = unitLabel + ' — ' + typeLabel;
+
+    const sections = state.type === 'deep-clean' ? deepCleanSectionsFor(state.unit) : sectionsFor(state.unit);
+    const body = document.getElementById('bkcBody');
+    body.innerHTML = '';
+
+    let totalItems = 0, doneItems = 0;
+    const flags = [];
+    const pestAlerts = [];
+
+    sections.forEach(sec => {
+      if (sec.divider) {
+        const dividerEl = document.createElement('div');
+        dividerEl.className = 'bkc-floor-divider';
+        dividerEl.textContent = translateTitle(sec.label);
+        body.appendChild(dividerEl);
+        return;
+      }
+
+      const collapsed = !!state.collapsedSections[sec.key];
+      const secEl = document.createElement('div');
+      secEl.className = 'bkc-section' + (collapsed ? ' collapsed' : '');
+
+      let secDone = 0;
+      sec.items.forEach((_, idx) => {
+        const k = itemKey(sec.key, idx);
+        if (state.checklist[k] && state.checklist[k].done) secDone++;
+      });
+      totalItems += sec.items.length;
+      doneItems += secDone;
+
+      const pestEntry = state.sectionPest[sec.key] || { active: false, note: '' };
+      if (pestEntry.active) {
+        pestAlerts.push(`${translateTitle(sec.title)}` + (pestEntry.note ? ` — "${pestEntry.note}"` : ''));
+      }
+
+      const head = document.createElement('div');
+      head.className = 'bkc-section-head';
+
+      const headLeft = document.createElement('div');
+      headLeft.innerHTML = `
+        <div class="bkc-section-title">${translateTitle(sec.title)}</div>
+        ${sec.subtitle ? `<div class="bkc-section-subtitle">${translateSubtitle(sec.subtitle)}</div>` : ''}
+      `;
+      head.appendChild(headLeft);
+
+      const headRight = document.createElement('div');
+      headRight.style.display = 'flex';
+      headRight.style.alignItems = 'center';
+      headRight.style.gap = '10px';
+
+      const sectionPestBtn = document.createElement('button');
+      sectionPestBtn.className = 'bkc-flag-btn bkc-pest-btn' + (pestEntry.active ? ' pest-active' : '');
+      sectionPestBtn.title = uiText('pestBtnTitle') || 'Report pest evidence found in this room';
+      sectionPestBtn.innerHTML = bugIcon();
+      sectionPestBtn.onclick = (e) => {
+        e.stopPropagation();
+        state.editingPestSection = state.editingPestSection === sec.key ? null : sec.key;
+        render();
+      };
+      headRight.appendChild(sectionPestBtn);
+
+      const countEl = document.createElement('div');
+      countEl.className = 'bkc-section-count';
+      countEl.textContent = `${secDone}/${sec.items.length}`;
+      headRight.appendChild(countEl);
+
+      const chevronEl = document.createElement('div');
+      chevronEl.className = 'bkc-chevron';
+      chevronEl.innerHTML = chevronIcon();
+      headRight.appendChild(chevronEl);
+
+      head.appendChild(headRight);
+      head.onclick = () => {
+        state.collapsedSections[sec.key] = !collapsed;
+        saveState();
+        render();
+      };
+      secEl.appendChild(head);
+
+      if (state.editingPestSection === sec.key) {
+        const pestPanel = document.createElement('div');
+        pestPanel.className = 'bkc-pest-wrap';
+
+        const pestLabel = document.createElement('div');
+        pestLabel.className = 'bkc-pest-label';
+        pestLabel.textContent = uiText('pestDetected') || '🐛 Pest evidence in this room';
+        pestPanel.appendChild(pestLabel);
+
+        const activeToggleRow = document.createElement('label');
+        activeToggleRow.style.display = 'flex';
+        activeToggleRow.style.alignItems = 'center';
+        activeToggleRow.style.gap = '8px';
+        activeToggleRow.style.marginBottom = '6px';
+        activeToggleRow.style.fontSize = '12.5px';
+
+        const activeCheckbox = document.createElement('input');
+        activeCheckbox.type = 'checkbox';
+        activeCheckbox.checked = pestEntry.active;
+        activeCheckbox.onchange = (e) => {
+          pestEntry.active = e.target.checked;
+          state.sectionPest[sec.key] = pestEntry;
+          saveState();
+          render();
+        };
+        activeToggleRow.appendChild(activeCheckbox);
+        const activeLabelText = document.createElement('span');
+        activeLabelText.textContent = uiText('pestConfirm') || 'Evidence of a pest found in this room';
+        activeToggleRow.appendChild(activeLabelText);
+        pestPanel.appendChild(activeToggleRow);
+
+        const pestNoteInput = document.createElement('textarea');
+        pestNoteInput.className = 'bkc-pest-note-input';
+        pestNoteInput.rows = 2;
+        pestNoteInput.placeholder = uiText('pestDescribe') || 'What did you find? (type, location, how many)';
+        pestNoteInput.value = pestEntry.note || '';
+        pestNoteInput.oninput = (e) => {
+          pestEntry.note = e.target.value;
+          state.sectionPest[sec.key] = pestEntry;
+          saveState();
+        };
+        pestPanel.appendChild(pestNoteInput);
+
+        const pestPhotoKey = 'pest::' + sec.key;
+        const pestPhotoRow = document.createElement('div');
+        pestPhotoRow.style.marginTop = '6px';
+        pestPhotoRow.style.display = 'flex';
+        pestPhotoRow.style.alignItems = 'center';
+        pestPhotoRow.style.gap = '8px';
+
+        const existingPestPhoto = state.photos[pestPhotoKey];
+        if (existingPestPhoto) {
+          const pestThumb = document.createElement('img');
+          pestThumb.src = existingPestPhoto;
+          pestThumb.style.width = '46px';
+          pestThumb.style.height = '46px';
+          pestThumb.style.objectFit = 'cover';
+          pestThumb.style.borderRadius = '8px';
+          pestThumb.style.border = '1px solid var(--line)';
+          pestPhotoRow.appendChild(pestThumb);
+        }
+
+        const pestCaptureBtn = document.createElement('button');
+        pestCaptureBtn.type = 'button';
+        pestCaptureBtn.className = 'bkc-camera-btn';
+        const takeLabel = uiText('takePhoto') || 'Take photo';
+        const retakeLabel = uiText('retakePhoto') || 'Retake photo';
+        pestCaptureBtn.innerHTML = cameraIcon() + `<span>${existingPestPhoto ? retakeLabel : takeLabel}</span>`;
+
+        const pestFileInput = document.createElement('input');
+        pestFileInput.type = 'file';
+        pestFileInput.accept = 'image/*';
+        pestFileInput.setAttribute('capture', 'environment');
+        pestFileInput.style.display = 'none';
+        pestFileInput.onchange = async (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          pestCaptureBtn.disabled = true;
+          pestCaptureBtn.innerHTML = cameraIcon() + `<span>${uiText('uploading') || 'Uploading…'}</span>`;
+          try {
+            state.photos[pestPhotoKey] = await uploadPhoto(file, `${state.unit}/${state.type}/pest-${sec.key}`);
+          } catch(err) {
+            console.error('pest photo upload failed', err);
+          }
+          pestEntry.active = true;
+          state.sectionPest[sec.key] = pestEntry;
+          saveState();
+          render();
+        };
+        pestCaptureBtn.onclick = () => pestFileInput.click();
+
+        pestPhotoRow.appendChild(pestCaptureBtn);
+        pestPhotoRow.appendChild(pestFileInput);
+        pestPanel.appendChild(pestPhotoRow);
+
+        secEl.appendChild(pestPanel);
+      }
+
+      const itemsWrap = document.createElement('div');
+      itemsWrap.className = 'bkc-items';
+
+      sec.items.forEach((text, idx) => {
+        const k = itemKey(sec.key, idx);
+        const entry = state.checklist[k] || { done: false, comment: '' };
+        if (entry.comment && entry.comment.trim()) {
+          flags.push(`${translateTitle(sec.title)}: ${translateItem(text)}` + ` — "${entry.comment}"`);
+        }
+
+        const isCritical = CRITICAL_ITEMS.has(text);
+        const row = document.createElement('div');
+        row.className = 'bkc-item' + (entry.done ? ' done' : '') + (isCritical ? ' critical' : '');
+
+
+        const check = document.createElement('div');
+        check.className = 'bkc-check' + (entry.done ? ' checked' : '');
+        check.innerHTML = checkIcon();
+        check.onclick = () => {
+          entry.done = !entry.done;
+          state.checklist[k] = entry;
+          saveState();
+          render();
+        };
+        row.appendChild(check);
+
+        const textWrap = document.createElement('div');
+        textWrap.style.flex = '1';
+        const textEl = document.createElement('div');
+        textEl.className = 'bkc-item-text';
+        textEl.innerHTML = (isCritical ? '<span class="bkc-critical-tag">' + (state.language === 'es' ? 'CRÍTICO' : 'CRITICAL') + '</span> ' : '') + translateItem(text).replace(/</g,'&lt;');
+        textWrap.appendChild(textEl);
+
+        const ownerNote = state.ownerNotes[k];
+
+        if (entry.comment && state.editingCommentKey !== k) {
+          const noteDisplay = document.createElement('div');
+          noteDisplay.className = 'bkc-item-note';
+          const yourNoteLabel = state.language === 'es' ? 'Tu nota:' : 'Your note:';
+          noteDisplay.textContent = `${yourNoteLabel} ${entry.comment}`;
+          textWrap.appendChild(noteDisplay);
+        }
+
+        if (REFERENCE_PHOTO_KEYS[k]) {
+          const refWrap = document.createElement('div');
+          refWrap.style.marginTop = '6px';
+          const refBtn = document.createElement('button');
+          refBtn.type = 'button';
+          refBtn.className = 'bkc-ref-btn';
+          const viewLabel = uiText('viewExample') || 'View example';
+          const hideLabel = uiText('hideExample') || 'Hide example';
+          refBtn.innerHTML = refPhotoIcon() + `<span>${state.refPhotoOpen[k] ? hideLabel : viewLabel}</span>`;
+          refBtn.onclick = () => {
+            state.refPhotoOpen[k] = !state.refPhotoOpen[k];
+            render();
+          };
+          refWrap.appendChild(refBtn);
+          if (state.refPhotoOpen[k]) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'bkc-ref-placeholder';
+            const caption = state.language === 'es' ? UI_ES.refCaption(REFERENCE_PHOTO_KEYS[k]) : REFERENCE_PHOTO_KEYS[k];
+            const pendingSuffix = uiText('refPending') || 'photo pending (add after the shoot)';
+            placeholder.textContent = `${caption} — ${pendingSuffix}`;
+            refWrap.appendChild(placeholder);
+          }
+          textWrap.appendChild(refWrap);
+        }
+
+        const isPhotoItem = text.toLowerCase().startsWith('photograph');
+        if (isPhotoItem) {
+          const photoWrap = document.createElement('div');
+          photoWrap.style.marginTop = '8px';
+          photoWrap.style.display = 'flex';
+          photoWrap.style.alignItems = 'center';
+          photoWrap.style.gap = '8px';
+
+          const existingUrl = state.photos[k];
+          if (existingUrl) {
+            const thumb = document.createElement('img');
+            thumb.src = existingUrl;
+            thumb.style.width = '46px';
+            thumb.style.height = '46px';
+            thumb.style.objectFit = 'cover';
+            thumb.style.borderRadius = '8px';
+            thumb.style.border = '1px solid var(--line)';
+            photoWrap.appendChild(thumb);
+          }
+
+          const captureBtn = document.createElement('button');
+          captureBtn.type = 'button';
+          captureBtn.className = 'bkc-camera-btn';
+          const takeLabel = uiText('takePhoto') || 'Take photo';
+          const retakeLabel = uiText('retakePhoto') || 'Retake photo';
+          captureBtn.innerHTML = cameraIcon() + `<span>${existingUrl ? retakeLabel : takeLabel}</span>`;
+
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = 'image/*';
+          fileInput.setAttribute('capture', 'environment');
+          fileInput.style.display = 'none';
+          fileInput.onchange = async (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            captureBtn.disabled = true;
+            captureBtn.innerHTML = cameraIcon() + `<span>${uiText('uploading') || 'Uploading…'}</span>`;
+            try {
+              state.photos[k] = await uploadPhoto(file, `${state.unit}/${state.type}/${k}`);
+            } catch(err) {
+              console.error('photo upload failed', err);
+            }
+            entry.done = true;
+            state.checklist[k] = entry;
+            saveState();
+            render();
+          };
+          captureBtn.onclick = () => fileInput.click();
+
+          photoWrap.appendChild(captureBtn);
+          photoWrap.appendChild(fileInput);
+          textWrap.appendChild(photoWrap);
+        }
+
+        if (state.editingCommentKey === k) {
+          const threadWrap = document.createElement('div');
+          threadWrap.className = 'bkc-thread';
+
+          if (ownerNote) {
+            const steveMsg = document.createElement('div');
+            steveMsg.className = 'bkc-thread-msg bkc-thread-msg-steve';
+            const noteLabel = uiText('noteFromSteve') || 'Note from Steve:';
+            const noteText = state.language === 'es' ? UI_ES.ownerNote(ownerNote) : ownerNote;
+            steveMsg.innerHTML = `<b>${noteLabel}</b> ${noteText.replace(/</g,'&lt;')}`;
+            threadWrap.appendChild(steveMsg);
+          }
+
+          const editOwnerBtn = document.createElement('button');
+          editOwnerBtn.className = 'bkc-thread-edit-link';
+          editOwnerBtn.textContent = ownerNote
+            ? (uiText('editSteveNote') || "Edit Steve's note")
+            : (uiText('addSteveNote') || 'Add a note from Steve');
+          editOwnerBtn.onclick = () => {
+            state.editingOwnerNoteKey = state.editingOwnerNoteKey === k ? null : k;
+            render();
+          };
+          threadWrap.appendChild(editOwnerBtn);
+
+          if (state.editingOwnerNoteKey === k) {
+            const editArea = document.createElement('textarea');
+            editArea.className = 'bkc-owner-note-input';
+            editArea.rows = 2;
+            editArea.placeholder = uiText('ownerNotePlaceholder') || 'Add a standing instruction for this item…';
+            editArea.value = ownerNote || '';
+            editArea.oninput = (e) => {
+              state.ownerNotes[k] = e.target.value;
+              saveOwnerNote(k, e.target.value);
+            };
+            editArea.onblur = () => { render(); };
+            threadWrap.appendChild(editArea);
+            setTimeout(() => editArea.focus(), 0);
+          }
+
+          const replyLabel = document.createElement('div');
+          replyLabel.className = 'bkc-thread-reply-label';
+          replyLabel.textContent = uiText('yourReply') || 'Your reply / note for Steve:';
+          threadWrap.appendChild(replyLabel);
+
+          const replyInput = document.createElement('textarea');
+          replyInput.className = 'bkc-note-input show';
+          replyInput.placeholder = uiText('whatNeedsAttention') || 'Anything Steve should know? (optional)';
+          replyInput.rows = 2;
+          replyInput.value = entry.comment || '';
+          replyInput.oninput = (e) => {
+            entry.comment = e.target.value;
+            state.checklist[k] = entry;
+            saveState();
+          };
+          threadWrap.appendChild(replyInput);
+
+          const closeThreadBtn = document.createElement('button');
+          closeThreadBtn.className = 'bkc-thread-close';
+          closeThreadBtn.textContent = uiText('doneBtn') || 'Done';
+          closeThreadBtn.onclick = () => {
+            state.editingCommentKey = null;
+            state.editingOwnerNoteKey = null;
+            render();
+          };
+          threadWrap.appendChild(closeThreadBtn);
+
+          textWrap.appendChild(threadWrap);
+        }
+
+        row.appendChild(textWrap);
+
+        const hasUnreadNote = ownerNote && !entry.comment;
+        const hasComment = !!(entry.comment && entry.comment.trim());
+        const commentBtn = document.createElement('button');
+        commentBtn.className = 'bkc-flag-btn bkc-comment-btn'
+          + (hasComment ? ' comment-active' : '')
+          + (hasUnreadNote ? ' note-pending' : '');
+        commentBtn.title = uiText('commentBtnTitle') || "View or add a note — Steve's instructions and your reply live here";
+        commentBtn.innerHTML = commentIcon();
+        commentBtn.onclick = () => {
+          state.editingCommentKey = state.editingCommentKey === k ? null : k;
+          render();
+        };
+        row.appendChild(commentBtn);
+
+        itemsWrap.appendChild(row);
+      });
+
+      secEl.appendChild(itemsWrap);
+      body.appendChild(secEl);
+    });
+
+    // progress
+    const pct = totalItems ? Math.round((doneItems / totalItems) * 100) : 0;
+    document.getElementById('bkcFill').style.width = pct + '%';
+    document.getElementById('bkcProgLabel').textContent = `${doneItems} of ${totalItems} done`;
+    const stamp = document.getElementById('bkcStamp');
+    stamp.textContent = pct + '%';
+    stamp.className = 'bkc-stamp' + (pct === 100 ? ' done' : '');
+
+    const flagBanner = document.getElementById('bkcFlagBanner');
+    if (flags.length) {
+      flagBanner.className = 'bkc-flags show';
+      const bannerLabel = uiText('flaggedFor', flags.length) || `${flags.length} item${flags.length > 1 ? 's' : ''} flagged for Steve:`;
+      flagBanner.innerHTML = `<b>${bannerLabel}</b><br>` + flags.map(f => `• ${f}`).join('<br>');
+    } else {
+      flagBanner.className = 'bkc-flags';
+      flagBanner.innerHTML = '';
+    }
+
+    const pestBanner = document.getElementById('bkcPestBanner');
+    if (pestAlerts.length) {
+      pestBanner.className = 'bkc-pest-banner show';
+      const pestBannerLabel = uiText('pestBannerLabel', pestAlerts.length)
+        || `🐛 ${pestAlerts.length} pest report${pestAlerts.length > 1 ? 's' : ''} for Steve:`;
+      pestBanner.innerHTML = `<b>${pestBannerLabel}</b><br>` + pestAlerts.map(f => `• ${f}`).join('<br>');
+    } else {
+      pestBanner.className = 'bkc-pest-banner';
+      pestBanner.innerHTML = '';
+    }
+
+    document.getElementById('bkcMeta').textContent = uiText('meta', state.sessionDate, nextDeepCleanLabel())
+      || `Session: ${state.sessionDate} · Next deep clean due: ${nextDeepCleanLabel()} · Shared checklist — visible to anyone with this link`;
+
+    document.getElementById('bkcNotesLabel').textContent = uiText('notesForSteve') || 'Notes for Steve';
+    const notesInput = document.getElementById('bkcNotesInput');
+    notesInput.placeholder = uiText('notesPlaceholder') || 'Anything else worth mentioning — leave it here.';
+    if (notesInput.value !== state.generalNotes) {
+      notesInput.value = state.generalNotes;
+    }
+
+    const identityLabel = uiText('signedInAs') || 'Signed in as';
+    document.getElementById('bkcIdentityLabel').textContent = `${identityLabel} ${state.cleanerName || '—'}`;
+    document.getElementById('bkcLogoutBtn').textContent = uiText('signOut') || 'Sign out';
+
+    document.getElementById('bkcSubmitBtn').textContent = uiText('completeArchive') || 'Complete & Archive Turnover';
+  }
+
+  document.getElementById('bkcNotesInput').addEventListener('input', (e) => {
+    state.generalNotes = e.target.value;
+    saveState();
+  });
+
+  document.getElementById('bkcLogoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('bkc-cleaner-auth');
+    location.reload();
+  });
+
+  document.getElementById('bkcSubmitBtn').addEventListener('click', () => {
+    state.showPasscodeModal = true;
+    state.passcodeInput = '';
+    state.passcodeError = false;
+    renderPasscodeModal();
+  });
+
+  function renderPasscodeModal(){
+    const overlay = document.getElementById('bkcPasscodeOverlay');
+    overlay.className = 'bkc-modal-overlay' + (state.showPasscodeModal ? ' show' : '');
+    document.getElementById('bkcPasscodeTitle').textContent = uiText('passcodeTitle') || 'Enter passcode to complete this turnover';
+    const input = document.getElementById('bkcPasscodeInput');
+    input.value = state.passcodeInput;
+    document.getElementById('bkcPasscodeErrorMsg').textContent = state.passcodeError
+      ? (uiText('passcodeWrong') || 'Incorrect passcode — try again.')
+      : '';
+    document.getElementById('bkcPasscodeCancel').textContent = uiText('cancelBtn') || 'Cancel';
+    document.getElementById('bkcPasscodeConfirm').textContent = uiText('confirmBtn') || 'Confirm';
+    if (state.showPasscodeModal) setTimeout(() => input.focus(), 0);
+  }
+
+  document.getElementById('bkcPasscodeInput').addEventListener('input', (e) => {
+    state.passcodeInput = e.target.value;
+  });
+  document.getElementById('bkcPasscodeInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('bkcPasscodeConfirm').click();
+  });
+
+  document.getElementById('bkcPasscodeCancel').addEventListener('click', () => {
+    state.showPasscodeModal = false;
+    renderPasscodeModal();
+  });
+
+  document.getElementById('bkcPasscodeConfirm').addEventListener('click', async () => {
+    if (state.passcodeInput !== PASSCODE) {
+      state.passcodeError = true;
+      state.passcodeInput = '';
+      renderPasscodeModal();
+      return;
+    }
+    state.showPasscodeModal = false;
+    renderPasscodeModal();
+
+    const record = buildArchiveRecord();
+    try{
+      await saveArchive(record);
+    } catch(e){
+      console.error('archive save failed', e);
+    }
+
+    // reset the live session — owner notes (standing instructions) and the signed-in
+    // cleaner identity both carry forward; everything else about THIS turnover resets
+    state.sessionDate = today();
+    state.checklist = {};
+    state.collapsedSections = {};
+    state.generalNotes = '';
+    state.photos = {};
+    state.sectionPest = {};
+    saveState();
+
+    const toast = document.getElementById('bkcToast');
+    const when = new Date(record.archivedAt).toLocaleString(state.language === 'es' ? 'es' : 'en-US');
+    toast.textContent = uiText('archivedToast', when) || `Turnover archived (${when}). Fresh checklist ready for the next cleaning.`;
+    toast.classList.add('show');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 4500);
+
+    render();
+  });
+
+  document.getElementById('bkcHomeBtn').addEventListener('click', () => {
+    state.showAddToHome = !state.showAddToHome;
+    renderHomePanel();
+  });
+
+  document.getElementById('bkcHelpBtn').addEventListener('click', () => {
+    state.showHelp = !state.showHelp;
+    renderHelpPanel();
+  });
+
+  document.getElementById('bkcArchiveBtn').addEventListener('click', async () => {
+    state.showArchivePanel = !state.showArchivePanel;
+    if (state.showArchivePanel) await loadArchiveList();
+    renderArchivePanel();
+  });
+
+  function renderArchivePanel(){
+    const panel = document.getElementById('bkcArchivePanel');
+    panel.className = 'bkc-home-panel' + (state.showArchivePanel ? ' show' : '');
+    panel.innerHTML = '';
+    if (!state.showArchivePanel) return;
+
+    const closeRow = document.createElement('div');
+    closeRow.className = 'bkc-panel-close-row';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'bkc-panel-close';
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = () => { state.showArchivePanel = false; renderArchivePanel(); };
+    closeRow.appendChild(closeBtn);
+    panel.appendChild(closeRow);
+
+    const title = document.createElement('p');
+    const unitLbl = (UNITS.find(u=>u.id===state.unit)||{}).label || state.unit;
+    const unitLblTranslated = state.language === 'es' ? UI_ES.unitLabel(unitLbl) : unitLbl;
+    title.innerHTML = `<b>${uiText('archiveTitle', unitLblTranslated) || 'Archived turnovers — ' + unitLbl}</b>`;
+    panel.appendChild(title);
+
+    if (!state.archiveList.length) {
+      const empty = document.createElement('p');
+      empty.textContent = uiText('archiveEmpty') || 'No archived records yet for this unit/type.';
+      panel.appendChild(empty);
+      return;
+    }
+
+    state.archiveList.forEach(entry => {
+      const row = document.createElement('div');
+      row.className = 'bkc-archive-entry';
+      const when = new Date(entry.archivedAt).toLocaleString(state.language === 'es' ? 'es' : 'en-US');
+      row.innerHTML = `<b>${when}</b><br>${entry.cleanerName} — ${entry.doneItems}/${entry.totalItems} · 💬 ${entry.commentCount} · 🐛 ${entry.pestCount}`;
+      const detail = document.createElement('div');
+      detail.className = 'bkc-archive-detail';
+      detail.style.display = 'none';
+      row.onclick = async () => {
+        if (detail.style.display === 'none') {
+          if (!detail._loaded) {
+            try{
+              const full = await loadArchiveDetail(entry.id);
+              detail.innerHTML = '';
+
+              const textPart = document.createElement('div');
+              let text = `${uiText('notesForSteve') || 'Notes'}: ${full.generalNotes || '—'}\n\n`;
+              if (full.commentedItems.length) {
+                text += (state.language === 'es' ? 'Notas por artículo:\n' : 'Item notes:\n');
+                full.commentedItems.forEach(c => { text += `• ${c.section}: ${c.item} — "${c.comment}"\n`; });
+                text += '\n';
+              }
+              if (full.pestReports.length) {
+                text += (state.language === 'es' ? 'Reportes de plagas:\n' : 'Pest reports:\n');
+                full.pestReports.forEach(p => { text += `• ${p.sectionKey}${p.note ? ' — "' + p.note + '"' : ''}\n`; });
+              }
+              textPart.textContent = text.trim();
+              detail.appendChild(textPart);
+
+              const photoEntries = Object.entries(full.photos || {});
+              if (photoEntries.length) {
+                const photoGrid = document.createElement('div');
+                photoGrid.className = 'bkc-archive-photo-grid';
+                photoEntries.forEach(([key, url]) => {
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.target = '_blank';
+                  link.rel = 'noopener';
+                  const img = document.createElement('img');
+                  img.src = url;
+                  img.loading = 'lazy';
+                  img.className = 'bkc-archive-photo-thumb';
+                  link.appendChild(img);
+                  photoGrid.appendChild(link);
+                });
+                detail.appendChild(photoGrid);
+              }
+            } catch(e){
+              console.error('archive detail load failed', e);
+              detail.textContent = uiText('archiveLoadError') || 'Could not load full record.';
+            }
+            detail._loaded = true;
+          }
+          detail.style.display = 'block';
+        } else {
+          detail.style.display = 'none';
+        }
+      };
+      row.appendChild(detail);
+      panel.appendChild(row);
+    });
+  }
+
+  function renderHomePanel(){
+    const panel = document.getElementById('bkcHomePanel');
+    panel.className = 'bkc-home-panel' + (state.showAddToHome ? ' show' : '');
+    panel.innerHTML = '';
+    if (!state.showAddToHome) return;
+
+    const closeRow = document.createElement('div');
+    closeRow.className = 'bkc-panel-close-row';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'bkc-panel-close';
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = () => { state.showAddToHome = false; renderHomePanel(); };
+    closeRow.appendChild(closeBtn);
+    panel.appendChild(closeRow);
+
+    const content = document.createElement('div');
+    if (state.language === 'es') {
+      content.innerHTML = `
+        <p><b>${UI_ES.addToHome}</b></p>
+        <p>📱 iPhone/iPad: ${UI_ES.addToHomeIOS}</p>
+        <p>🤖 Android: ${UI_ES.addToHomeAndroid}</p>
+      `;
+    } else {
+      content.innerHTML = `
+        <p><b>Add This App to Your Home Screen</b></p>
+        <p>📱 iPhone/iPad (Safari): tap the Share button (square with an arrow), scroll down, then tap "Add to Home Screen".</p>
+        <p>🤖 Android (Chrome): tap the ⋮ menu in the top right, then tap "Add to Home screen" or "Install app".</p>
+      `;
+    }
+    panel.appendChild(content);
+  }
+
+  let hasInitializedOnce = false;
+  let realtimeChannel = null;
+
+  function isTypingSomewhere(){
+    const el = document.activeElement;
+    return el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && el.type !== 'checkbox'));
+  }
+
+  // True live sync: subscribes to Postgres changes on this unit+type's row so everyone
+  // looking at the same checklist (cleaner, Steve, his wife) sees updates within ~1 second,
+  // no manual refresh or polling delay. Skips applying an incoming update if someone's
+  // actively typing here, so it never clobbers an in-progress note.
+  function subscribeToLiveUpdates(){
+    if (realtimeChannel) {
+      sb.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+    realtimeChannel = sb
+      .channel(`checklist-${state.unit}-${state.type}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'checklist_sessions',
+        filter: `unit=eq.${state.unit}`,
+      }, (payload) => {
+        const row = payload.new;
+        if (!row || row.type !== state.type) return; // filter only covers one column; double-check the other
+        if (state.showPasscodeModal || isTypingSomewhere()) return;
+        loadState().then(render);
+      })
+      .subscribe();
+  }
+
+  async function init(){
+    document.getElementById('bkcBody').innerHTML = '<div class="bkc-loading">Loading checklist…</div>';
+    loadLanguage();
+    await loadState();
+    if (!hasInitializedOnce) {
+      // Only on the very first load of this session — not on every unit/type tab switch,
+      // which also calls init() to reload that combo's saved state.
+      state.showHelp = true;
+      state.showAddToHome = true;
+      hasInitializedOnce = true;
+    }
+    subscribeToLiveUpdates(); // re-subscribes with the current unit/type filter every init() call
+    render();
+    renderHomePanel();
+    renderHelpPanel();
+  }
+
+  // ---- Cleaner login -------------------------------------------------------
+  // The Edge Function is the only thing that can check a PIN (see migration —
+  // verify_cleaner_pin() isn't callable by the public anon key). This function
+  // IS the auth step, so it doesn't need/have a Supabase session of its own.
+  const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/verify-cleaner-pin`;
+
+  async function verifyCleanerLogin(name, pin){
+    const resp = await fetch(EDGE_FUNCTION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ name, pin }),
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return resp.json(); // { ok: boolean, name?: string }
+  }
+
+  function showLoginScreen(show){
+    document.getElementById('bkcLoginOverlay').className = 'bkc-login-overlay' + (show ? ' show' : '');
+  }
+
+  function setLoginError(msg){
+    document.getElementById('bkcLoginErrorMsg').textContent = msg || '';
+  }
+
+  function setLoginLoading(loading){
+    const btn = document.getElementById('bkcLoginSubmit');
+    btn.disabled = loading;
+    btn.textContent = loading ? '…' : (uiText('signIn') || 'Sign In');
+  }
+
+  async function handleLoginSubmit(){
+    const name = document.getElementById('bkcLoginName').value.trim();
+    const pin = document.getElementById('bkcLoginPin').value.trim();
+    if (!name || !pin) {
+      setLoginError(uiText('loginMissingFields') || 'Enter your name and PIN.');
+      return;
+    }
+    setLoginLoading(true);
+    setLoginError('');
+    try {
+      const result = await verifyCleanerLogin(name, pin);
+      if (result.ok) {
+        localStorage.setItem('bkc-cleaner-auth', JSON.stringify({ name, pin }));
+        state.cleanerName = result.name;
+        showLoginScreen(false);
+        await init();
+      } else {
+        setLoginError(uiText('loginRejected') || 'Name or PIN not recognized. Ask Steve for access.');
+      }
+    } catch (e) {
+      console.error('login failed', e);
+      setLoginError(uiText('loginNetworkError') || 'Could not reach the server. Check your connection and try again.');
+    }
+    setLoginLoading(false);
+  }
+
+  document.getElementById('bkcLoginSubmit').addEventListener('click', handleLoginSubmit);
+  document.getElementById('bkcLoginPin').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLoginSubmit();
+  });
+  document.getElementById('bkcLoginName').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('bkcLoginPin').focus();
+  });
+
+  async function bootApp(){
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem('bkc-cleaner-auth') || 'null'); } catch(e) { stored = null; }
+
+    if (stored && stored.name && stored.pin) {
+      let result = null;
+      let networkFailed = false;
+      try {
+        result = await verifyCleanerLogin(stored.name, stored.pin);
+      } catch (e) {
+        networkFailed = true;
+        console.warn('login re-verification network failure, proceeding with cached identity', e);
+      }
+
+      if (networkFailed) {
+        // Genuine connectivity problem, not a rejection — don't lock someone out over
+        // spotty wifi. Proceed with the cached identity; re-verification just happens
+        // again next load. This is the ONLY path that fails open, and it's isolated
+        // from the rejection path below on purpose.
+        state.cleanerName = stored.name;
+        showLoginScreen(false);
+        await init();
+        return;
+      }
+
+      if (result && result.ok) {
+        state.cleanerName = result.name;
+        showLoginScreen(false);
+        await init();
+        return;
+      }
+
+      // Explicitly rejected by the server (wrong PIN, or account deactivated — this IS
+      // the revocation moment for a fired cleaner). This branch must never grant access,
+      // so clearing storage gets its own try/catch: even if it fails, we still fall
+      // through to the login screen below rather than letting a clearing error be
+      // mistaken for a network failure and accidentally admit someone.
+      try { localStorage.removeItem('bkc-cleaner-auth'); } catch(e) { /* ignore */ }
+    }
+    showLoginScreen(true);
+    document.getElementById('bkcLoginTitle').textContent = uiText('loginTitle') || 'Sign in to continue';
+    setTimeout(() => document.getElementById('bkcLoginName').focus(), 0);
+  }
+
+  bootApp();
+})();
+</script>
+</body>
+</html>

@@ -37,10 +37,7 @@
   .bkc-header{
     padding: 22px 18px 16px;
     border-bottom: 1px solid rgba(246,241,231,0.12);
-    position: sticky;
-    top: 0;
     background: var(--ink);
-    z-index: 20;
   }
 
   .bkc-brand{
@@ -133,10 +130,15 @@
   .bkc-pill:active{ transform: scale(0.96); }
 
   .bkc-progress-wrap{
-    padding: 16px 18px 4px;
+    padding: 14px 18px;
     display:flex;
     align-items:center;
     gap: 14px;
+    position: sticky;
+    top: 0;
+    background: var(--ink);
+    border-bottom: 1px solid rgba(246,241,231,0.12);
+    z-index: 20;
   }
   .bkc-stamp{
     flex-shrink:0;
